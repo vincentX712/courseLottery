@@ -1,1 +1,1 @@
-# courseLottery
+# 专家选课系统
