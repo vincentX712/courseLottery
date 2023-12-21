@@ -11,4 +11,12 @@ import lombok.Data;
 @Data
 @TableName("t_schedule")
 public class ScheduleDO {
+
+    private Integer id;
+
+    private Integer courseId;
+
+    private Integer expertId;
+
+    private String evaluation; // 评价等级
 }

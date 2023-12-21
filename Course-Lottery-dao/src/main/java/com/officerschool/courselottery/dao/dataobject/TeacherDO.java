@@ -11,4 +11,14 @@ import lombok.Data;
 @Data
 @TableName("t_teacher")
 public class TeacherDO {
+
+    private Integer id;
+
+    private String name;
+
+    private String title; //职称
+
+    private String education; // 学历
+
+    private Integer age;
 }
