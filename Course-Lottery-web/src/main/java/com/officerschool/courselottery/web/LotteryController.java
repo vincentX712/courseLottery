@@ -3,10 +3,14 @@ package com.officerschool.courselottery.web;
 import com.alibaba.fastjson.JSON;
 import com.officerschool.courselottery.common.enums.ErrorCodeEnum;
 import com.officerschool.courselottery.common.models.CommonResult;
+import com.officerschool.courselottery.common.models.req.ConfirmLotteryReq;
 import com.officerschool.courselottery.common.models.req.ExpertsPageReq;
+import com.officerschool.courselottery.common.models.req.LotteryReq;
 import com.officerschool.courselottery.service.ExpertService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,17 +32,40 @@ public class LotteryController {
     @Resource
     private ExpertService expertService;
 
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public CommonResult test() {
-        return CommonResult.createOK("okk系统");
-    }
-
     @RequestMapping(value = "/experts", method = RequestMethod.GET)
     public CommonResult experts(ExpertsPageReq req) {
         try {
             return CommonResult.createOK(expertService.getExpertList(req));
         } catch (Exception e) {
             logger.error("LotteryController#experts error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
+
+    @RequestMapping(value = "/lottery", method = RequestMethod.POST)
+    public CommonResult lottery(@RequestBody LotteryReq req) {
+        try {
+            if (StringUtils.isBlank(req.getExpertId().toString())) {
+                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
+            }
+            return CommonResult.createOK(expertService.lottery(req));
+        } catch (Exception e) {
+            logger.error("LotteryController#lottery error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
+
+    @RequestMapping(value = "/confirm", method = RequestMethod.POST)
+    public CommonResult confirmLottery(@RequestBody ConfirmLotteryReq req) {
+        try {
+            if (StringUtils.isBlank(req.getExpertId().toString()) || StringUtils.isBlank(req.getCourseId().toString()))
+                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
+
+            return CommonResult.createOK(expertService.confirmLottery(req));
+        } catch (Exception e) {
+            logger.error("LotteryController#confirmLottery error: ", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }

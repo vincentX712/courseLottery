@@ -16,7 +16,7 @@ public class CourseDO {
 
     private Integer id;
 
-    private Time data;
+    private Time date;
 
     private String week;
 

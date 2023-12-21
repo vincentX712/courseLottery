@@ -18,5 +18,7 @@ public class ScheduleDO {
 
     private Integer expertId;
 
+    private Integer teacherId;
+
     private String evaluation; // 评价等级
 }

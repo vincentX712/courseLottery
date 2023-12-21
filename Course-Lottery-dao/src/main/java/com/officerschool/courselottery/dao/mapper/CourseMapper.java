@@ -2,6 +2,10 @@ package com.officerschool.courselottery.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.officerschool.courselottery.dao.dataobject.CourseDO;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * @author : create by anyuxin
@@ -9,4 +13,7 @@ import com.officerschool.courselottery.dao.dataobject.CourseDO;
  * @date : 2023/12/20
  */
 public interface CourseMapper extends BaseMapper<CourseDO> {
+
+    @Select("${sql}")
+    List<CourseDO> getCourseList(@Param("sql") String sql);
 }
