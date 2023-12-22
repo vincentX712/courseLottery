@@ -1,6 +1,7 @@
 package com.officerschool.courselottery.web;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.officerschool.courselottery.common.enums.ErrorCodeEnum;
 import com.officerschool.courselottery.common.models.CommonResult;
 import com.officerschool.courselottery.common.models.req.ConfirmLotteryReq;
@@ -69,4 +70,21 @@ public class LotteryController {
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }
+
+    // 判断教员有没有被听过课
+    @RequestMapping(value = "/isListened", method = RequestMethod.POST)
+    public CommonResult isListened(@RequestBody JSONObject req) {
+        try {
+            int teacherId = req.getInteger("teacherId");
+            if (StringUtils.isBlank(String.valueOf(teacherId)))
+                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
+
+            return CommonResult.createOK(expertService.isListened(teacherId));
+
+        } catch (Exception e) {
+            logger.error("LotteryController#isListened error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
 }

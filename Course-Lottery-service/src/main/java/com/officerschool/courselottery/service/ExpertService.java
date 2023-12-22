@@ -1,5 +1,6 @@
 package com.officerschool.courselottery.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.officerschool.courselottery.common.Utils.TimeUtil;
 import com.officerschool.courselottery.common.models.req.ConfirmLotteryReq;
@@ -163,5 +164,16 @@ public class ExpertService {
         schedule.setCourseId(req.getCourseId());
         schedule.setTeacherId(course.getTeacherId());
         return scheduleMapper.insert(schedule) > 0;
+    }
+
+    /**
+     * 判断教员是否被听过课
+     * @param teacherId
+     * @return
+     */
+    public JSONObject isListened(int teacherId) {
+        JSONObject result = new JSONObject();
+        result.put("isListened", isCourseTeacherHasLotteried(teacherId) ? 1 : 0);
+        return result;
     }
 }
