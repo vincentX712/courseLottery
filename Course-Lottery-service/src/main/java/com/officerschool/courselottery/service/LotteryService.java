@@ -49,7 +49,7 @@ public class LotteryService {
             if (StringUtils.isNotBlank(req.getNodeId().toString()))
                 sql += " and node_id="+ req.getNodeId();
             if (!listCourseId.isEmpty())
-                sql += " and course_id not in (" + listCourseId.stream().map(Object::toString).collect(Collectors.joining(","));
+                sql += " and t_course.id not in (" + listCourseId.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
 
             sql += " and date='" + TimeUtil.getCurrentDate() + "'";
 
