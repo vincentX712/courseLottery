@@ -13,10 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * @author : create by anyuxin
@@ -37,19 +36,20 @@ public class LotteryService {
             return null;
         // 1. 随机抽课
         LotteryRes res = new LotteryRes();
-        if (hasLotteried(req.getExpertId())) {  // 该专家已被抽取，不能再抽
-            res.setCode(1);
-            res.setMessage("该专家已抽过课程，不能重复抽课！");
-            return res;
-        }
+
+        // 该专家已抽过的课
+        List<Integer> listCourseId = hasLotteriedCourseId(req.getExpertId());
 
         List<CourseDO> courseList;
+
         if (StringUtils.isNotBlank(req.getTitle())) {  // 需要连表查询
             String sql = "select * from t_course left join t_teacher on t_course.teacher_id=t_teacher.id where title='" + req.getTitle() + "'";
             if (StringUtils.isNotBlank(req.getCampusId().toString()))
                 sql += " and campus_id=" + req.getCampusId();
             if (StringUtils.isNotBlank(req.getNodeId().toString()))
                 sql += " and node_id="+ req.getNodeId();
+            if (!listCourseId.isEmpty())
+                sql += " and course_id not in (" + listCourseId.stream().map(Object::toString).collect(Collectors.joining(","));
 
             sql += " and date='" + TimeUtil.getCurrentDate() + "'";
 
@@ -61,6 +61,9 @@ public class LotteryService {
 
             if (StringUtils.isNotBlank(req.getNodeId().toString()))
                 queryWrapper.eq("node_id", req.getNodeId());
+
+            if (!listCourseId.isEmpty())
+                queryWrapper.notIn("course_id", listCourseId);
 
             queryWrapper.eq("date", TimeUtil.getCurrentDate());
 
@@ -106,6 +109,14 @@ public class LotteryService {
         QueryWrapper<ScheduleDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("expert_id", expertId);
         return scheduleMapper.selectCount(queryWrapper) > 0;
+    }
+
+    // 该专家已抽过的课id
+    private List<Integer> hasLotteriedCourseId(int expertId) {
+        QueryWrapper<ScheduleDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("expert_id", expertId);
+
+        return scheduleMapper.selectList(queryWrapper).stream().map(ScheduleDO::getCourseId).collect(Collectors.toList());
     }
 
 
