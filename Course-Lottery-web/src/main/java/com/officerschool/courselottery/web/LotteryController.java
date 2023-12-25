@@ -7,7 +7,10 @@ import com.officerschool.courselottery.common.models.CommonResult;
 import com.officerschool.courselottery.common.models.req.ConfirmLotteryReq;
 import com.officerschool.courselottery.common.models.req.ExpertsPageReq;
 import com.officerschool.courselottery.common.models.req.LotteryReq;
+import com.officerschool.courselottery.common.models.req.SchedulesPageReq;
 import com.officerschool.courselottery.service.ExpertService;
+import com.officerschool.courselottery.service.LotteryService;
+import com.officerschool.courselottery.service.ScheduleService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,12 @@ public class LotteryController {
     @Resource
     private ExpertService expertService;
 
+    @Resource
+    private ScheduleService scheduleService;
+
+    @Resource
+    private LotteryService lotteryService;
+
     @RequestMapping(value = "/experts", method = RequestMethod.GET)
     public CommonResult experts(ExpertsPageReq req) {
         try {
@@ -50,7 +59,7 @@ public class LotteryController {
             if (StringUtils.isBlank(req.getExpertId().toString())) {
                 return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
             }
-            return CommonResult.createOK(expertService.lottery(req));
+            return CommonResult.createOK(lotteryService.lottery(req));
         } catch (Exception e) {
             logger.error("LotteryController#lottery error: ", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
@@ -64,25 +73,20 @@ public class LotteryController {
             if (StringUtils.isBlank(req.getExpertId().toString()) || StringUtils.isBlank(req.getCourseId().toString()))
                 return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
 
-            return CommonResult.createOK(expertService.confirmLottery(req));
+            return CommonResult.createOK(lotteryService.confirmLottery(req));
         } catch (Exception e) {
             logger.error("LotteryController#confirmLottery error: ", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }
 
-    // 判断教员有没有被听过课
-    @RequestMapping(value = "/isListened", method = RequestMethod.POST)
-    public CommonResult isListened(@RequestBody JSONObject req) {
+
+    @RequestMapping(value = "/schedules", method = RequestMethod.GET)
+    public CommonResult schedules(SchedulesPageReq req) {
         try {
-            int teacherId = req.getInteger("teacherId");
-            if (StringUtils.isBlank(String.valueOf(teacherId)))
-                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
-
-            return CommonResult.createOK(expertService.isListened(teacherId));
-
+            return CommonResult.createOK(scheduleService.getSchedules(req));
         } catch (Exception e) {
-            logger.error("LotteryController#isListened error: ", e);
+            logger.error("LotteryController#schedules error: ", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }

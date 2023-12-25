@@ -3,6 +3,8 @@ package com.officerschool.courselottery.dao.dataobject;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * @author : create by anyuxin
  * @version : v1.0
@@ -21,4 +23,5 @@ public class ScheduleDO {
     private Integer teacherId;
 
     private String evaluation; // 评价等级
+
 }
