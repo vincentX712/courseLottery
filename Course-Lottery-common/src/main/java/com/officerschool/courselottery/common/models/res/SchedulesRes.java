@@ -31,4 +31,14 @@ public class SchedulesRes {
     private String campusName;
 
     private String classroom;
+
+    private String teacherName;
+
+    private String title;
+
+    private String education;
+
+    private String age;
+
+    private String expertName;
 }

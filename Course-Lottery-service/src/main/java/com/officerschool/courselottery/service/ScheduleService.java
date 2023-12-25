@@ -34,7 +34,11 @@ public class ScheduleService {
 
         PageHelper.startPage(pageNum, pageSize);
 
-        String sql = "select * from t_schedule left join t_course on t_schedule.course_id = t_course.id where ";
+        String sql = "select * , t_teacher.name as t_name, t_expert.name as e_name from t_schedule " +
+                "left join t_course on t_schedule.course_id = t_course.id " +
+                "left join t_teacher on t_schedule.teacher_id = t_teacher.id " +
+                "left join t_expert on t_schedule.expert_id = t_expert.id " +
+                "where ";
         if (StringUtils.isNotBlank(req.getDate()))
             sql += "t_course.date='" + req.getDate() + "'";
         else
@@ -68,6 +72,11 @@ public class ScheduleService {
             res.setMajor(mapItem.get("major").toString());
             res.setCampusName(mapItem.get("campus_name").toString());
             res.setClassroom(mapItem.get("classroom").toString());
+            res.setTeacherName(mapItem.get("t_name").toString());
+            res.setTitle(mapItem.get("title").toString());
+            res.setEducation(mapItem.get("education").toString());
+            res.setAge(mapItem.get("age").toString());
+            res.setExpertName(mapItem.get("e_name").toString());
             resList.add(res);
         }
         resPage.setList(resList);
