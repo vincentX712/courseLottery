@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.officerschool.courselottery.common.enums.ErrorCodeEnum;
 import com.officerschool.courselottery.common.models.CommonResult;
-import com.officerschool.courselottery.common.models.req.ConfirmLotteryReq;
-import com.officerschool.courselottery.common.models.req.ExpertsPageReq;
-import com.officerschool.courselottery.common.models.req.LotteryReq;
-import com.officerschool.courselottery.common.models.req.SchedulesPageReq;
+import com.officerschool.courselottery.common.models.req.*;
+import com.officerschool.courselottery.service.CourseService;
 import com.officerschool.courselottery.service.ExpertService;
 import com.officerschool.courselottery.service.LotteryService;
 import com.officerschool.courselottery.service.ScheduleService;
@@ -41,6 +39,9 @@ public class LotteryController {
 
     @Resource
     private LotteryService lotteryService;
+
+    @Resource
+    private CourseService courseService;
 
     @RequestMapping(value = "/experts", method = RequestMethod.GET)
     public CommonResult experts(ExpertsPageReq req) {
@@ -85,6 +86,16 @@ public class LotteryController {
     public CommonResult schedules(SchedulesPageReq req) {
         try {
             return CommonResult.createOK(scheduleService.getSchedules(req));
+        } catch (Exception e) {
+            logger.error("LotteryController#schedules error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/courses", method = RequestMethod.GET)
+    public CommonResult courses(CoursesPageReq req) {
+        try {
+            return CommonResult.createOK(courseService.getCourses(req));
         } catch (Exception e) {
             logger.error("LotteryController#schedules error: ", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);

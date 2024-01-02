@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : create by anyuxin
@@ -16,4 +17,6 @@ public interface CourseMapper extends BaseMapper<CourseDO> {
 
     @Select("${sql}")
     List<CourseDO> getCourseList(@Param("sql") String sql);
+    @Select("${sql}")
+    List<Map<String, Object>> getCoursesList(String sql);
 }

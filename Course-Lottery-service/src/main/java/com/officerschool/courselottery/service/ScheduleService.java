@@ -45,7 +45,7 @@ public class ScheduleService {
             sql += "t_course.date='" + TimeUtil.getCurrentDate() + "'";
 
         if (StringUtils.isNotBlank(req.getTeacherTitle()))
-            sql += " and t_course.teacher_title='" + req.getTeacherTitle() + "'";
+            sql += " and t_teacher.title='" + req.getTeacherTitle() + "'";
 
         if (StringUtils.isNotBlank(req.getLesson()))
             sql += " and t_course.lesson like '%" + req.getLesson() + "%'";
@@ -77,6 +77,10 @@ public class ScheduleService {
             res.setEducation(mapItem.get("education").toString());
             res.setAge(mapItem.get("age").toString());
             res.setExpertName(mapItem.get("e_name").toString());
+            res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
+            if(mapItem.get("notes")!=null){
+                res.setNotes(mapItem.get("notes").toString());
+            }
             resList.add(res);
         }
         resPage.setList(resList);

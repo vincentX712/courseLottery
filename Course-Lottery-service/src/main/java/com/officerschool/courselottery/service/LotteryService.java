@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.officerschool.courselottery.common.Utils.TimeUtil;
 import com.officerschool.courselottery.common.models.req.ConfirmLotteryReq;
 import com.officerschool.courselottery.common.models.req.LotteryReq;
+import com.officerschool.courselottery.common.models.res.ConfirmLotteryRes;
 import com.officerschool.courselottery.common.models.res.LotteryRes;
 import com.officerschool.courselottery.dao.dataobject.CourseDO;
 import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
@@ -129,16 +130,27 @@ public class LotteryService {
         return scheduleMapper.selectCount(queryWrapper) > 0;
     }
 
-    public boolean confirmLottery(ConfirmLotteryReq req) {
+    public ConfirmLotteryRes confirmLottery(ConfirmLotteryReq req) {
         QueryWrapper<CourseDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", req.getCourseId());
         CourseDO course = courseMapper.selectOne(queryWrapper);
-
-        ScheduleDO schedule = new ScheduleDO();
-        schedule.setExpertId(req.getExpertId());
-        schedule.setCourseId(req.getCourseId());
-        schedule.setTeacherId(course.getTeacherId());
-        return scheduleMapper.insert(schedule) > 0;
+        QueryWrapper<ScheduleDO> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("course_id", req.getCourseId());
+        queryWrapper1.eq("expert_id", req.getExpertId());
+        ConfirmLotteryRes res = new ConfirmLotteryRes();
+        List<ScheduleDO> sche = scheduleMapper.selectList(queryWrapper1);
+        if(!sche.isEmpty()){
+            res.setRes(false);
+            res.setMsg("该专家已抽取过该课，请抽取其他课！");
+        }else{
+            ScheduleDO schedule = new ScheduleDO();
+            schedule.setExpertId(req.getExpertId());
+            schedule.setCourseId(req.getCourseId());
+            schedule.setTeacherId(course.getTeacherId());
+            res.setRes(scheduleMapper.insert(schedule) > 0);
+            res.setMsg("成功");
+        }
+        return res;
     }
 
 }

@@ -41,4 +41,8 @@ public class SchedulesRes {
     private String age;
 
     private String expertName;
+
+    private Integer nodeId;
+
+    private String notes;
 }
