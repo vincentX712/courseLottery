@@ -1,7 +1,5 @@
 package com.officerschool.courselottery.web;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.officerschool.courselottery.common.enums.ErrorCodeEnum;
 import com.officerschool.courselottery.common.models.CommonResult;
 import com.officerschool.courselottery.common.models.req.*;

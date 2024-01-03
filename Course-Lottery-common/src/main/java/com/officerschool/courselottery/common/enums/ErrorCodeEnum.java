@@ -21,7 +21,7 @@ public enum ErrorCodeEnum {
 
     CRON_EXPRESSION_INVALID(-1006, "cron表达式不合法"),
 
-    TOO_MANY_UNFINISHED_TASK(-1007, "进行中的任务过多，请稍后再试"),
+    FILE_FORMAT_ERROR(-1007, "文件格式错误"),
 
     DATABASE_CONNECT_FAILED(-1008, "数据库连接不上"),
 
