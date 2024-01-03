@@ -34,4 +34,6 @@ public class CoursesRes {
 
     private String notes;
 
+    private String expertName;
+
 }
