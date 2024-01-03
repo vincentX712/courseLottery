@@ -97,12 +97,11 @@ public class FileController {
     }
 
     @RequestMapping(value = "/excelExport/schedules", method = RequestMethod.GET)
-    public CommonResult excelExport(HttpServletResponse response) {
+    public void excelExport(HttpServletResponse response) {
         try {
-            return CommonResult.createOK(scheduleService.exportToExcel(response));
+            scheduleService.exportToExcel(response);
         } catch (Exception e) {
             logger.error("excelExport error", e);
-            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }
 }

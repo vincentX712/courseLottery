@@ -17,6 +17,6 @@ public interface ScheduleMapper extends BaseMapper<ScheduleDO> {
     @Select("${sql}")
     List<Map<String, Object>> getScheduleList(String sql);
 
-    @Select("select * from schedule")
+    @Select("select * from t_schedule")
     List<ScheduleDO> selectAll();
 }

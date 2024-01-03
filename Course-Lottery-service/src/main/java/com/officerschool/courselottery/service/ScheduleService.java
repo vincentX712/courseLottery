@@ -12,6 +12,8 @@ import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,6 +31,8 @@ import java.util.Map;
 
 @Service
 public class ScheduleService {
+
+    private final Logger logger = LoggerFactory.getLogger(ScheduleService.class);
 
     @Resource
     private ScheduleMapper scheduleMapper;
@@ -93,35 +97,37 @@ public class ScheduleService {
         return resPage;
     }
 
-    public boolean exportToExcel(HttpServletResponse response) throws Exception {
-        List<ScheduleDO> scheduleDOList = scheduleMapper.selectAll();
-        //设置信息头，告诉浏览器内容为excel类型
-        response.setHeader("content-Type", "application/vnd.ms-excel");
-        //文件名称
-        String fileName = "听课表.xls";
-        //sheet名称
-        String sheetName = "听课表";
-        fileName = new String(fileName.getBytes(), "ISO-8859-1");
+    public void exportToExcel(HttpServletResponse response){
+        try {
+            List<ScheduleDO> scheduleDOList = scheduleMapper.selectAll();
+            //设置信息头，告诉浏览器内容为excel类型
+            response.setHeader("content-Type", "application/vnd.ms-excel");
+            //文件名称
+            String fileName = "听课表.xls";
+            //sheet名称
+            String sheetName = "听课表";
+            fileName = new String(fileName.getBytes(), "ISO-8859-1");
 
-        //设置下载名称
-        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-        //字节流输出
-        ServletOutputStream out = response.getOutputStream();
-        //设置excel参数
-        ExportParams params = new ExportParams();
-        //设置sheet名
-        params.setSheetName(sheetName);
-        //设置标题
-        params.setTitle("听课表");
+            //设置下载名称
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+            //字节流输出
+            ServletOutputStream out = response.getOutputStream();
+            //设置excel参数
+            ExportParams params = new ExportParams();
+            //设置sheet名
+            params.setSheetName(sheetName);
+            //设置标题
+//        params.setTitle("听课表");
 
-        //转成对应的类型
+            //转成对应的类型
 //        List<ScheduleDO> exportUsers = changeType(users);
-        //导入excel
-        Workbook workbook = ExcelExportUtil.exportExcel(params, ScheduleDO.class, scheduleDOList);
-        //写入
-        workbook.write(out);
-
-        return true;
+            //导入excel
+            Workbook workbook = ExcelExportUtil.exportExcel(params, ScheduleDO.class, scheduleDOList);
+            //写入
+            workbook.write(out);
+        } catch (Exception e) {
+            logger.error("ScheduleService#exportToExcel error: ", e);
+        }
     }
 
 }
