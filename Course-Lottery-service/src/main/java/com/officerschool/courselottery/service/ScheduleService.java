@@ -1,20 +1,25 @@
 package com.officerschool.courselottery.service;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.officerschool.courselottery.common.Utils.TimeUtil;
 import com.officerschool.courselottery.common.models.req.SchedulesPageReq;
 import com.officerschool.courselottery.common.models.res.SchedulesRes;
+import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
 import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * @author : create by anyuxin
@@ -86,6 +91,37 @@ public class ScheduleService {
         resPage.setList(resList);
 
         return resPage;
+    }
+
+    public boolean exportToExcel(HttpServletResponse response) throws Exception {
+        List<ScheduleDO> scheduleDOList = scheduleMapper.selectAll();
+        //设置信息头，告诉浏览器内容为excel类型
+        response.setHeader("content-Type", "application/vnd.ms-excel");
+        //文件名称
+        String fileName = "听课表.xls";
+        //sheet名称
+        String sheetName = "听课表";
+        fileName = new String(fileName.getBytes(), "ISO-8859-1");
+
+        //设置下载名称
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        //字节流输出
+        ServletOutputStream out = response.getOutputStream();
+        //设置excel参数
+        ExportParams params = new ExportParams();
+        //设置sheet名
+        params.setSheetName(sheetName);
+        //设置标题
+        params.setTitle("听课表");
+
+        //转成对应的类型
+//        List<ScheduleDO> exportUsers = changeType(users);
+        //导入excel
+        Workbook workbook = ExcelExportUtil.exportExcel(params, ScheduleDO.class, scheduleDOList);
+        //写入
+        workbook.write(out);
+
+        return true;
     }
 
 }

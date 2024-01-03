@@ -6,9 +6,13 @@ import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
 import com.officerschool.courselottery.common.enums.ErrorCodeEnum;
 import com.officerschool.courselottery.common.models.CommonResult;
 import com.officerschool.courselottery.dao.dataobject.ExpertExcelDO;
+import com.officerschool.courselottery.service.CourseService;
 import com.officerschool.courselottery.service.ExpertService;
+import com.officerschool.courselottery.service.ScheduleService;
+import com.officerschool.courselottery.service.TeacherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author : create by anyuxin
@@ -31,6 +36,15 @@ public class FileController {
     @Resource
     private ExpertService expertService;
 
+    @Resource
+    private TeacherService teacherService;
+
+    @Resource
+    private CourseService courseService;
+
+    @Resource
+    private ScheduleService scheduleService;
+
     @RequestMapping(value = "/excelImport/experts", method = RequestMethod.POST)
     public CommonResult excelImportExperts(@RequestParam("file") MultipartFile file) {
         try {
@@ -43,20 +57,49 @@ public class FileController {
 
             return CommonResult.createOK(expertService.importExcel(file));
         } catch (Exception e) {
-            logger.error("excelImport error", e);
+            logger.error("FileController#excelImportExperts error", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }
 
-    private static boolean verifyExpertExcelHeadLine() {
+    @RequestMapping(value = "/excelImport/teachers", method = RequestMethod.POST)
+    public CommonResult excelImportTeachers(@RequestParam("file") MultipartFile file) {
+        try {
+            if (file == null)
+                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
+            // 验证文件格式
+            String fileName = file.getOriginalFilename();
+            if (!fileName.endsWith(".xls") && !fileName.endsWith(".xlsx"))
+                return CommonResult.fail(ErrorCodeEnum.FILE_FORMAT_ERROR);
 
-        return true;
+            return CommonResult.createOK(teacherService.importExcel(file));
+        } catch (Exception e) {
+            logger.error("FileController#excelImportExperts error", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
     }
 
-    @RequestMapping(value = "/excelExport", method = RequestMethod.POST)
-    public CommonResult excelExport() {
+    @RequestMapping(value = "/excelImport/courses", method = RequestMethod.POST)
+    public CommonResult excelImportCourses(@RequestParam("file") MultipartFile file) {
         try {
-            return CommonResult.createOK();
+            if (file == null)
+                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
+            // 验证文件格式
+            String fileName = file.getOriginalFilename();
+            if (!fileName.endsWith(".xls") && !fileName.endsWith(".xlsx"))
+                return CommonResult.fail(ErrorCodeEnum.FILE_FORMAT_ERROR);
+
+            return CommonResult.createOK(courseService.importExcel(file));
+        } catch (Exception e) {
+            logger.error("FileController#excelImportCourses error", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/excelExport/schedules", method = RequestMethod.GET)
+    public CommonResult excelExport(HttpServletResponse response) {
+        try {
+            return CommonResult.createOK(scheduleService.exportToExcel(response));
         } catch (Exception e) {
             logger.error("excelExport error", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);

@@ -58,20 +58,12 @@ public class ExpertService extends ServiceImpl<ExpertMapper, ExpertDO> {
     }
 
     public boolean importExcel(MultipartFile file) {
-        ImportParams importParams = new ImportParams();
-        importParams.setHeadRows(1);
-
         try {
-            List<ExpertDO> result = ExcelImportUtil.importExcel(file.getInputStream(), ExpertDO.class, importParams);
+            List<ExpertDO> result = ExcelImportUtil.importExcel(file.getInputStream(), ExpertDO.class, new ImportParams());
             return saveBatch(result);
         } catch (Exception e) {
             logger.error("ExpertService#importExcel error: ", e);
             return false;
         }
     }
-
-    private void batchInsert(List<ExpertDO> expertList) {
-
-    }
-
 }

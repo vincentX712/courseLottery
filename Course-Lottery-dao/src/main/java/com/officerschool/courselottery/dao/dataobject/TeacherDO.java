@@ -1,5 +1,6 @@
 package com.officerschool.courselottery.dao.dataobject;
 
+import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -14,11 +15,15 @@ public class TeacherDO {
 
     private Integer id;
 
+    @Excel(name = "name")
     private String name;
 
+    @Excel(name = "title")
     private String title; //职称
 
+    @Excel(name = "education")
     private String education; // 学历
 
+    @Excel(name = "age")
     private Integer age;
 }

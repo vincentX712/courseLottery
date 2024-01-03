@@ -1,16 +1,21 @@
 package com.officerschool.courselottery.service;
 
+import cn.afterturn.easypoi.excel.ExcelImportUtil;
+import cn.afterturn.easypoi.excel.entity.ImportParams;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.officerschool.courselottery.common.Utils.TimeUtil;
 import com.officerschool.courselottery.common.models.req.CoursesPageReq;
 import com.officerschool.courselottery.common.models.res.CoursesRes;
+import com.officerschool.courselottery.dao.dataobject.CourseDO;
 import com.officerschool.courselottery.dao.mapper.CourseMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -18,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class CourseService {
+public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
 
     private final Logger logger = LoggerFactory.getLogger(CourseService.class);
 
@@ -77,5 +82,15 @@ public class CourseService {
         }
         resPage.setList(resList);
         return resPage;
+    }
+
+    public boolean importExcel(MultipartFile file) {
+        try {
+            List<CourseDO> result = ExcelImportUtil.importExcel(file.getInputStream(), CourseDO.class, new ImportParams());
+            return saveBatch(result);
+        } catch (Exception e) {
+            logger.error("CourseService#importExcel error: ", e);
+            return false;
+        }
     }
 }
