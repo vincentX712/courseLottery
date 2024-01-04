@@ -4,6 +4,7 @@ import cn.afterturn.easypoi.excel.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.sql.Date;
 import java.sql.Time;
 
 /**
@@ -17,8 +18,8 @@ public class CourseDO {
 
     private Integer id;
 
-    @Excel(name = "date")
-    private Time date;
+    @Excel(name = "date", importFormat = "yyyy-MM-dd")
+    private Date date;
 
     @Excel(name = "week")
     private String week;
