@@ -13,6 +13,7 @@ import lombok.Data;
 @TableName("t_teacher")
 public class TeacherDO {
 
+    @Excel(name = "id")
     private Integer id;
 
     @Excel(name = "name")
