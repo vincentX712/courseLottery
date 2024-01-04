@@ -99,7 +99,7 @@ public class ScheduleService {
 
     public void exportToExcel(HttpServletResponse response){
         try {
-            List<ScheduleDO> scheduleDOList = scheduleMapper.selectAll();
+            List<SchedulesRes> scheduleResList = getAllSchedules();
             //设置信息头，告诉浏览器内容为excel类型
             response.setHeader("content-Type", "application/vnd.ms-excel");
             //文件名称
@@ -122,12 +122,49 @@ public class ScheduleService {
             //转成对应的类型
 //        List<ScheduleDO> exportUsers = changeType(users);
             //导入excel
-            Workbook workbook = ExcelExportUtil.exportExcel(params, ScheduleDO.class, scheduleDOList);
+            Workbook workbook = ExcelExportUtil.exportExcel(params, SchedulesRes.class, scheduleResList);
             //写入
             workbook.write(out);
         } catch (Exception e) {
             logger.error("ScheduleService#exportToExcel error: ", e);
         }
+    }
+
+    private List<SchedulesRes> getAllSchedules() {
+        String sql = "select * , t_teacher.name as t_name, t_expert.name as e_name from t_schedule " +
+                "left join t_course on t_schedule.course_id = t_course.id " +
+                "left join t_teacher on t_schedule.teacher_id = t_teacher.id " +
+                "left join t_expert on t_schedule.expert_id = t_expert.id ";
+
+        List<Map<String, Object>> list = scheduleMapper.getScheduleList(sql);
+
+        List<SchedulesRes> resList = new ArrayList<>();
+        for (Map<String, Object> mapItem : list) {
+            SchedulesRes res = new SchedulesRes();
+            res.setId(Integer.valueOf(mapItem.get("id").toString()));
+            res.setCourseId(Integer.valueOf(mapItem.get("course_id").toString()));
+            res.setExpertId(Integer.valueOf(mapItem.get("expert_id").toString()));
+            res.setTeacherId(Integer.valueOf(mapItem.get("teacher_id").toString()));
+            res.setEvaluation(mapItem.get("evaluation") == null ? "" : mapItem.get("evaluation").toString());
+            res.setDate(mapItem.get("date") == null ? "" : mapItem.get("date").toString());
+            res.setWeek(mapItem.get("week") == null ? "" : mapItem.get("week").toString());
+            res.setLesson(mapItem.get("lesson").toString());
+            res.setMajor(mapItem.get("major").toString());
+            res.setCampusName(mapItem.get("campus_name").toString());
+            res.setClassroom(mapItem.get("classroom").toString());
+            res.setTeacherName(mapItem.get("t_name").toString());
+            res.setTitle(mapItem.get("title").toString());
+            res.setEducation(mapItem.get("education").toString());
+            res.setAge(mapItem.get("age").toString());
+            res.setExpertName(mapItem.get("e_name").toString());
+            res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
+            if(mapItem.get("notes")!=null){
+                res.setNotes(mapItem.get("notes").toString());
+            }
+            resList.add(res);
+        }
+
+        return resList;
     }
 
 }
