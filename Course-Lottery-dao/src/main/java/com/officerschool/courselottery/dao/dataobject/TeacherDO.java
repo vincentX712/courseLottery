@@ -1,6 +1,8 @@
 package com.officerschool.courselottery.dao.dataobject;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -13,18 +15,19 @@ import lombok.Data;
 @TableName("t_teacher")
 public class TeacherDO {
 
-    @Excel(name = "id")
+    @TableId(value = "id", type = IdType.AUTO)
+    @Excel(name = "教员id")
     private Integer id;
 
-    @Excel(name = "name")
+    @Excel(name = "教员姓名")
     private String name;
 
-    @Excel(name = "title")
+    @Excel(name = "教员职称")
     private String title; //职称
 
-    @Excel(name = "education")
+    @Excel(name = "教员学历")
     private String education; // 学历
 
-    @Excel(name = "age")
+    @Excel(name = "教员年龄")
     private Integer age;
 }

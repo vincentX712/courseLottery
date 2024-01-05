@@ -1,7 +1,7 @@
 package com.officerschool.courselottery.dao.dataobject;
 
 import cn.afterturn.easypoi.excel.annotation.Excel;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 /**
@@ -13,8 +13,9 @@ import lombok.Data;
 @TableName("t_expert")
 public class ExpertDO {
 
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @Excel(name = "name")
+    @Excel(name = "专家姓名")
     private String name;
 }

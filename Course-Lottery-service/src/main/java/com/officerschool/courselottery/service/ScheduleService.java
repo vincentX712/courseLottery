@@ -51,17 +51,17 @@ public class ScheduleService {
         if (StringUtils.isNotBlank(req.getDate()))
             sql += "t_course.date='" + req.getDate() + "'";
         else
-            sql += "t_course.date='" + TimeUtil.getCurrentDate() + "'";
+            sql += "t_course.date='" + TimeUtil.getCurrentDate() + "' ";
 
         if (StringUtils.isNotBlank(req.getTeacherTitle()))
-            sql += " and t_teacher.title='" + req.getTeacherTitle() + "'";
+            sql += " and t_teacher.title='" + req.getTeacherTitle() + "' ";
 
         if (StringUtils.isNotBlank(req.getLesson()))
-            sql += " and t_course.lesson like '%" + req.getLesson() + "%'";
+            sql += " and t_course.lesson like '%" + req.getLesson() + "%' ";
 
         if (StringUtils.isNotBlank(req.getMajor()))
-            sql += " and t_course.major like '%" + req.getMajor() + " %'";
-
+            sql += " and t_course.major like '%" + req.getMajor() + " %' ";
+        sql += "order by t_schedule.course_id";
         List<Map<String, Object>> list = scheduleMapper.getScheduleList(sql);
 
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(list);
@@ -97,13 +97,13 @@ public class ScheduleService {
         return resPage;
     }
 
-    public void exportToExcel(HttpServletResponse response){
+    public void exportToExcel(HttpServletResponse response,SchedulesPageReq req){
         try {
-            List<SchedulesRes> scheduleResList = getAllSchedules();
+            List<SchedulesRes> scheduleResList = getSchedulesExecel(req);
             //设置信息头，告诉浏览器内容为excel类型
             response.setHeader("content-Type", "application/vnd.ms-excel");
             //文件名称
-            String fileName = "听课表.xls";
+            String fileName = "听课表.xlsx";
             //sheet名称
             String sheetName = "听课表";
             fileName = new String(fileName.getBytes(), "ISO-8859-1");
@@ -130,11 +130,25 @@ public class ScheduleService {
         }
     }
 
-    private List<SchedulesRes> getAllSchedules() {
+    private List<SchedulesRes> getSchedulesExecel(SchedulesPageReq req) {
         String sql = "select * , t_teacher.name as t_name, t_expert.name as e_name from t_schedule " +
                 "left join t_course on t_schedule.course_id = t_course.id " +
                 "left join t_teacher on t_schedule.teacher_id = t_teacher.id " +
-                "left join t_expert on t_schedule.expert_id = t_expert.id ";
+                "left join t_expert on t_schedule.expert_id = t_expert.id " + "where ";
+        if (StringUtils.isNotBlank(req.getDate()))
+            sql += "t_course.date='" + req.getDate() + "' ";
+        else
+            sql += "t_course.date='" + TimeUtil.getCurrentDate() + "' ";
+
+        if (StringUtils.isNotBlank(req.getTeacherTitle()))
+            sql += " and t_teacher.title='" + req.getTeacherTitle() + "' ";
+
+        if (StringUtils.isNotBlank(req.getLesson()))
+            sql += " and t_course.lesson like '%" + req.getLesson() + "%' ";
+
+        if (StringUtils.isNotBlank(req.getMajor()))
+            sql += " and t_course.major like '%" + req.getMajor() + " %' ";
+        sql += "order by t_schedule.course_id";
 
         List<Map<String, Object>> list = scheduleMapper.getScheduleList(sql);
 

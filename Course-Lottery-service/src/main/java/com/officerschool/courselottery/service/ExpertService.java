@@ -2,13 +2,11 @@ package com.officerschool.courselottery.service;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
-import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.officerschool.courselottery.common.models.req.ExpertsPageReq;
 import com.officerschool.courselottery.common.models.res.ExpertRes;
 import com.officerschool.courselottery.dao.dataobject.ExpertDO;
-import com.officerschool.courselottery.dao.dataobject.ExpertExcelDO;
 import com.officerschool.courselottery.dao.mapper.ExpertMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
 import org.slf4j.Logger;

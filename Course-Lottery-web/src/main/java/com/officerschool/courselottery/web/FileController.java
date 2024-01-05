@@ -1,18 +1,14 @@
 package com.officerschool.courselottery.web;
 
-import cn.afterturn.easypoi.excel.ExcelImportUtil;
-import cn.afterturn.easypoi.excel.entity.ImportParams;
-import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
 import com.officerschool.courselottery.common.enums.ErrorCodeEnum;
 import com.officerschool.courselottery.common.models.CommonResult;
-import com.officerschool.courselottery.dao.dataobject.ExpertExcelDO;
+import com.officerschool.courselottery.common.models.req.SchedulesPageReq;
 import com.officerschool.courselottery.service.CourseService;
 import com.officerschool.courselottery.service.ExpertService;
 import com.officerschool.courselottery.service.ScheduleService;
 import com.officerschool.courselottery.service.TeacherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
  * @date : 2024/1/2
  */
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/lottery/file")
 public class FileController {
 
     private final Logger logger = LoggerFactory.getLogger(FileController.class);
@@ -97,9 +93,9 @@ public class FileController {
     }
 
     @RequestMapping(value = "/excelExport/schedules", method = RequestMethod.GET)
-    public void excelExport(HttpServletResponse response) {
+    public void excelExport(HttpServletResponse response, SchedulesPageReq req) {
         try {
-            scheduleService.exportToExcel(response);
+            scheduleService.exportToExcel(response,req);
         } catch (Exception e) {
             logger.error("excelExport error", e);
         }
