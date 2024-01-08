@@ -43,9 +43,8 @@ public class ScheduleService {
 
         PageHelper.startPage(pageNum, pageSize);
 
-        String sql = "select * , t_teacher.name as t_name, t_expert.name as e_name from t_schedule " +
+        String sql = "select * , t_expert.name as e_name from t_schedule " +
                 "left join t_course on t_schedule.course_id = t_course.id " +
-                "left join t_teacher on t_schedule.teacher_id = t_teacher.id " +
                 "left join t_expert on t_schedule.expert_id = t_expert.id " +
                 "where ";
         if (StringUtils.isNotBlank(req.getDate()))
@@ -54,7 +53,7 @@ public class ScheduleService {
             sql += "t_course.date='" + TimeUtil.getCurrentDate() + "' ";
 
         if (StringUtils.isNotBlank(req.getTeacherTitle()))
-            sql += " and t_teacher.title='" + req.getTeacherTitle() + "' ";
+            sql += " and t_course.teacher_title='" + req.getTeacherTitle() + "' ";
 
         if (StringUtils.isNotBlank(req.getLesson()))
             sql += " and t_course.lesson like '%" + req.getLesson() + "%' ";
@@ -73,7 +72,7 @@ public class ScheduleService {
             res.setId(Integer.valueOf(mapItem.get("id").toString()));
             res.setCourseId(Integer.valueOf(mapItem.get("course_id").toString()));
             res.setExpertId(Integer.valueOf(mapItem.get("expert_id").toString()));
-            res.setTeacherId(Integer.valueOf(mapItem.get("teacher_id").toString()));
+//            res.setTeacherId(Integer.valueOf(mapItem.get("teacher_id").toString()));
             res.setEvaluation(mapItem.get("evaluation") == null ? "" : mapItem.get("evaluation").toString());
             res.setDate(mapItem.get("date") == null ? "" : mapItem.get("date").toString());
             res.setWeek(mapItem.get("week") == null ? "" : mapItem.get("week").toString());
@@ -81,10 +80,10 @@ public class ScheduleService {
             res.setMajor(mapItem.get("major").toString());
             res.setCampusName(mapItem.get("campus_name").toString());
             res.setClassroom(mapItem.get("classroom").toString());
-            res.setTeacherName(mapItem.get("t_name").toString());
-            res.setTitle(mapItem.get("title").toString());
-            res.setEducation(mapItem.get("education").toString());
-            res.setAge(mapItem.get("age").toString());
+            res.setTeacherName(mapItem.get("teacher_name").toString());
+            res.setTitle(mapItem.get("teacher_title").toString());
+            res.setEducation(mapItem.get("teacher_education").toString());
+            res.setAge(mapItem.get("teacher_age").toString());
             res.setExpertName(mapItem.get("e_name").toString());
             res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
             if(mapItem.get("notes")!=null){
@@ -131,9 +130,8 @@ public class ScheduleService {
     }
 
     private List<SchedulesRes> getSchedulesExecel(SchedulesPageReq req) {
-        String sql = "select * , t_teacher.name as t_name, t_expert.name as e_name from t_schedule " +
+        String sql = "select * ,  t_expert.name as e_name from t_schedule " +
                 "left join t_course on t_schedule.course_id = t_course.id " +
-                "left join t_teacher on t_schedule.teacher_id = t_teacher.id " +
                 "left join t_expert on t_schedule.expert_id = t_expert.id " + "where ";
         if (StringUtils.isNotBlank(req.getDate()))
             sql += "t_course.date='" + req.getDate() + "' ";
@@ -141,7 +139,7 @@ public class ScheduleService {
             sql += "t_course.date='" + TimeUtil.getCurrentDate() + "' ";
 
         if (StringUtils.isNotBlank(req.getTeacherTitle()))
-            sql += " and t_teacher.title='" + req.getTeacherTitle() + "' ";
+            sql += " and t_course.teacher_title like '%'" + req.getTeacherTitle() + "%' ";
 
         if (StringUtils.isNotBlank(req.getLesson()))
             sql += " and t_course.lesson like '%" + req.getLesson() + "%' ";
@@ -158,7 +156,7 @@ public class ScheduleService {
             res.setId(Integer.valueOf(mapItem.get("id").toString()));
             res.setCourseId(Integer.valueOf(mapItem.get("course_id").toString()));
             res.setExpertId(Integer.valueOf(mapItem.get("expert_id").toString()));
-            res.setTeacherId(Integer.valueOf(mapItem.get("teacher_id").toString()));
+//            res.setTeacherId(Integer.valueOf(mapItem.get("teacher_id").toString()));
             res.setEvaluation(mapItem.get("evaluation") == null ? "" : mapItem.get("evaluation").toString());
             res.setDate(mapItem.get("date") == null ? "" : mapItem.get("date").toString());
             res.setWeek(mapItem.get("week") == null ? "" : mapItem.get("week").toString());
@@ -166,10 +164,10 @@ public class ScheduleService {
             res.setMajor(mapItem.get("major").toString());
             res.setCampusName(mapItem.get("campus_name").toString());
             res.setClassroom(mapItem.get("classroom").toString());
-            res.setTeacherName(mapItem.get("t_name").toString());
-            res.setTitle(mapItem.get("title").toString());
-            res.setEducation(mapItem.get("education").toString());
-            res.setAge(mapItem.get("age").toString());
+            res.setTeacherName(mapItem.get("teacher_name").toString());
+            res.setTitle(mapItem.get("teacher_title").toString());
+            res.setEducation(mapItem.get("teacher_education").toString());
+            res.setAge(mapItem.get("teacher_age").toString());
             res.setExpertName(mapItem.get("e_name").toString());
             res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
             if(mapItem.get("notes")!=null){

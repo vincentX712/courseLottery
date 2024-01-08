@@ -39,8 +39,20 @@ public class CourseDO {
     @Excel(name = "专业（人数）")
     private String major;
 
-    @Excel(name = "教员id")
-    private Integer teacherId;
+//    @Excel(name = "教员id")
+//    private Integer teacherId;
+
+    @Excel(name="教员姓名")
+    private String teacherName;
+
+    @Excel(name="教员职称")
+    private String teacherTitle;
+
+    @Excel(name="教员学历")
+    private String teacherEducation;
+
+    @Excel(name="教员年龄")
+    private String teacherAge;
 
     @Excel(name = "校区id（1：富春校区，2：西溪校区）")
     private Integer campusId;

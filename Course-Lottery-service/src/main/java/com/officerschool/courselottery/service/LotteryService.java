@@ -81,24 +81,24 @@ public class LotteryService {
         CourseDO course = courseList.get(index);
 
         // 2. 判断抽中的课程对应的教员是否已被其他专家抽过课
-        if (StringUtils.isBlank(String.valueOf(course.getTeacherId()))) {
-            res.setCode(1);
-            res.setMessage("该课程的教员信息为空！");
-            return res;
-        }
-        if (isCourseTeacherHasLotteried(course.getTeacherId())) {
-            res.setIsNeedConfirm(1);
-            res.setExpertId(req.getExpertId());
-            res.setCourseId(course.getId());
-            res.setCode(0);
-            return res;
-        }
+//        if (StringUtils.isBlank(String.valueOf(course.getTeacherId()))) {
+//            res.setCode(1);
+//            res.setMessage("该课程的教员信息为空！");
+//            return res;
+//        }
+//        if (isCourseTeacherHasLotteried(course.getTeacherId())) {
+//            res.setIsNeedConfirm(1);
+//            res.setExpertId(req.getExpertId());
+//            res.setCourseId(course.getId());
+//            res.setCode(0);
+//            return res;
+//        }
 
         // 3. 添加抽课记录，抽课成功
         ScheduleDO schedule = new ScheduleDO();
         schedule.setExpertId(req.getExpertId());
         schedule.setCourseId(course.getId());
-        schedule.setTeacherId(course.getTeacherId());
+//        schedule.setTeacherId(course.getTeacherId());
         scheduleMapper.insert(schedule);
         res.setIsNeedConfirm(0);
         res.setCode(0);
@@ -146,7 +146,7 @@ public class LotteryService {
             ScheduleDO schedule = new ScheduleDO();
             schedule.setExpertId(req.getExpertId());
             schedule.setCourseId(req.getCourseId());
-            schedule.setTeacherId(course.getTeacherId());
+//            schedule.setTeacherId(course.getTeacherId());
             res.setRes(scheduleMapper.insert(schedule) > 0);
             res.setMsg("成功");
         }

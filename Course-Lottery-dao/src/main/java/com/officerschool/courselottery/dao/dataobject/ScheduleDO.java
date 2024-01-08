@@ -26,8 +26,8 @@ public class ScheduleDO {
     @Excel(name = "expert_id")
     private Integer expertId;
 
-    @Excel(name = "teacher_id")
-    private Integer teacherId;
+//    @Excel(name = "teacher_id")
+//    private Integer teacherId;
 
     @Excel(name = "evaluation")
     private String evaluation; // 评价等级

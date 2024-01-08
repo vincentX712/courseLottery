@@ -41,25 +41,24 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
         int pageSize = req.getPageSize() == null ? 20 : req.getPageSize();
 
         PageHelper.startPage(pageNum, pageSize);
-        String sql = "select * , t_teacher.name as t_name from t_course " +
-                "left join t_teacher on t_course.teacher_id = t_teacher.id " +
+        String sql = "select * from t_course " +
                 "where ";
         if (StringUtils.isNotBlank(req.getDate()))
-            sql += "t_course.date='" + req.getDate() + "'";
+            sql += "date='" + req.getDate() + "' ";
         else
-            sql += "t_course.date='" + TimeUtil.getCurrentDate() + "'";
+            sql += "date='" + TimeUtil.getCurrentDate() + "' ";
 
         if (StringUtils.isNotBlank(req.getTeacherTitle()))
-            sql += " and t_teacher.title='" + req.getTeacherTitle() + "'";
+            sql += " and teacher_title like '%" + req.getTeacherTitle() + "%' ";
 
         if (StringUtils.isNotBlank(req.getLesson()))
-            sql += " and t_course.lesson like '%" + req.getLesson() + "%'";
+            sql += " and lesson like '%" + req.getLesson() + "%' ";
 
         if (StringUtils.isNotBlank(req.getMajor()))
-            sql += " and t_course.major like '%" + req.getMajor() + " %'";
+            sql += " and major like '%" + req.getMajor() + " %' ";
 
         if(StringUtils.isNotBlank(req.getCampusId())){
-            sql += " and t_course.campus_id='" + req.getCampusId() + "'";
+            sql += " and campus_id='" + req.getCampusId() + "' ";
         }
 
         List<Map<String, Object>> courseList = courseMapper.getCoursesList(sql);
@@ -87,10 +86,10 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
             res.setDate(mapItem.get("date").toString());
             res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
             res.setMajor(mapItem.get("major").toString());
-            res.setTeacherName(mapItem.get("t_name").toString());
-            res.setTitle(mapItem.get("title").toString());
-            res.setEducation(mapItem.get("education").toString());
-            res.setAge(mapItem.get("age").toString());
+            res.setTeacherName(mapItem.get("teacher_name").toString());
+            res.setTitle(mapItem.get("teacher_title").toString());
+            res.setEducation(mapItem.get("teacher_education").toString());
+            res.setAge(mapItem.get("teacher_age").toString());
             res.setClassroom(mapItem.get("classroom").toString());
             res.setCampusName(mapItem.get("campus_name").toString());
             if(mapItem.get("notes")!=null){
