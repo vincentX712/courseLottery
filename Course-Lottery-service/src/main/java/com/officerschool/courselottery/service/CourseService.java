@@ -73,7 +73,13 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
             List<Map<String, Object>> expertList = scheduleMapper.getScheduleList(expertSql);
 //            System.out.println(expertSql);
             for (Map<String, Object> expertMap : expertList) {
-                courseIdExpertNameMap.put(expertMap.get("course_id").toString(), expertMap.get("name").toString());
+                String val = courseIdExpertNameMap.get(expertMap.get("course_id").toString());
+                if(val == null){
+                    courseIdExpertNameMap.put(expertMap.get("course_id").toString(), expertMap.get("name").toString());
+                }else{
+                    courseIdExpertNameMap.put(expertMap.get("course_id").toString(), val + "，" + expertMap.get("name").toString());
+                }
+
             }
         }
 

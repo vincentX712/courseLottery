@@ -27,11 +27,11 @@ public class CourseDO {
     @Excel(name = "星期")
     private String week;
 
-    @Excel(name = "节次")
+    @Excel(name = "节次（填入单节id）")
     private Integer nodeId;
 
-    @Excel(name = "节次名")
-    private String nodeName;
+//    @Excel(name = "节次名")
+//    private String nodeName;
 
     @Excel(name = "课程名称")
     private String lesson;
