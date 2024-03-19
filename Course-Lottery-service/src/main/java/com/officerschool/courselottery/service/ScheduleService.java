@@ -2,10 +2,13 @@ package com.officerschool.courselottery.service;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.officerschool.courselottery.common.Utils.TimeUtil;
+import com.officerschool.courselottery.common.models.req.ScheduleDeleteReq;
 import com.officerschool.courselottery.common.models.req.SchedulesPageReq;
+import com.officerschool.courselottery.common.models.res.ScheduleDeleteRes;
 import com.officerschool.courselottery.common.models.res.SchedulesRes;
 import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
 import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
@@ -60,7 +63,7 @@ public class ScheduleService {
 
         if (StringUtils.isNotBlank(req.getMajor()))
             sql += " and t_course.major like '%" + req.getMajor() + " %' ";
-        sql += "order by t_schedule.course_id";
+        sql += "order by t_schedule.expert_id";
         List<Map<String, Object>> list = scheduleMapper.getScheduleList(sql);
 
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(list);
@@ -146,7 +149,7 @@ public class ScheduleService {
 
         if (StringUtils.isNotBlank(req.getMajor()))
             sql += " and t_course.major like '%" + req.getMajor() + " %' ";
-        sql += "order by t_schedule.course_id";
+        sql += "order by t_schedule.expert_id";
 
         List<Map<String, Object>> list = scheduleMapper.getScheduleList(sql);
 
@@ -177,6 +180,21 @@ public class ScheduleService {
         }
 
         return resList;
+    }
+
+    public ScheduleDeleteRes deleteSchedule(ScheduleDeleteReq req){
+        QueryWrapper<ScheduleDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", req.getScheduleId());
+        ScheduleDeleteRes res = new ScheduleDeleteRes();
+        if(scheduleMapper.selectCount(queryWrapper)>0){
+            res.setRes(scheduleMapper.delete(queryWrapper) > 0);
+            res.setMsg("成功");
+        }else{
+            res.setRes(false);
+            res.setMsg("计划不存在，请重试！");
+        }
+
+        return res;
     }
 
 }

@@ -23,4 +23,6 @@ public class CoursesPageReq {
     private String major;  // 专业名，支持模糊查询
 
     private String campusId;
+
+    private String nodeId;
 }

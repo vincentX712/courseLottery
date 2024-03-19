@@ -90,6 +90,16 @@ public class LotteryController {
         }
     }
 
+    @RequestMapping(value = "/schedule/delete", method = RequestMethod.POST)
+    public CommonResult scheduleDelete(@RequestBody ScheduleDeleteReq req) {
+        try {
+            return CommonResult.createOK(scheduleService.deleteSchedule(req));
+        } catch (Exception e) {
+            logger.error("LotteryController#schedules error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(value = "/courses", method = RequestMethod.GET)
     public CommonResult courses(CoursesPageReq req) {
         try {

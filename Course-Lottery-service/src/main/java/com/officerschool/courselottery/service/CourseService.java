@@ -55,12 +55,17 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
             sql += " and lesson like '%" + req.getLesson() + "%' ";
 
         if (StringUtils.isNotBlank(req.getMajor()))
-            sql += " and major like '%" + req.getMajor() + " %' ";
+            sql += " and major like '%" + req.getMajor() + "%' ";
 
         if(StringUtils.isNotBlank(req.getCampusId())){
             sql += " and campus_id='" + req.getCampusId() + "' ";
         }
 
+        if(StringUtils.isNotBlank(req.getNodeId())){
+            sql += " and node_id='" + req.getNodeId() + "' ";
+        }
+
+        sql += " order by node_id";
         List<Map<String, Object>> courseList = courseMapper.getCoursesList(sql);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(courseList);
         PageInfo<CoursesRes> resPage = PageUtil.convertPageInfo2PageInfoVo(pageInfo);
@@ -69,7 +74,8 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
         List<Integer> courseIdList = courseList.stream().map(mapItem -> Integer.valueOf(mapItem.get("id").toString())).collect(Collectors.toList());
         Map<String, String> courseIdExpertNameMap = new HashMap<>();
         if (!courseIdList.isEmpty()) {
-            String expertSql = "select * from t_schedule, t_expert where t_schedule.expert_id = t_expert.id and t_schedule.course_id in(" + StringUtils.join(courseIdList, ",") + ")";
+            String expertSql = "select * from t_schedule, t_expert where t_schedule.expert_id = t_expert.id and t_schedule.course_id in("
+                    + StringUtils.join(courseIdList, ",") + ") ";
             List<Map<String, Object>> expertList = scheduleMapper.getScheduleList(expertSql);
 //            System.out.println(expertSql);
             for (Map<String, Object> expertMap : expertList) {
