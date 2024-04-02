@@ -14,6 +14,8 @@ public class SchedulesPageReq {
 
     private Integer pageSize;
 
+    private Integer expertId;
+
     private String teacherTitle;
 
     private String date; // 默认当天

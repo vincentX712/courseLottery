@@ -25,4 +25,6 @@ public class CoursesPageReq {
     private String campusId;
 
     private String nodeId;
+
+    private Boolean isPolitics;
 }

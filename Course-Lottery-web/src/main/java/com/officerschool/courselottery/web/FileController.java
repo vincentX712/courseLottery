@@ -92,6 +92,23 @@ public class FileController {
         }
     }
 
+    @RequestMapping(value = "/excelImport/schedules", method = RequestMethod.POST)
+    public CommonResult excelImportSchedules(@RequestParam("file") MultipartFile file) {
+        try {
+            if (file == null)
+                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
+            // 验证文件格式
+            String fileName = file.getOriginalFilename();
+            if (!fileName.endsWith(".xls") && !fileName.endsWith(".xlsx") && !fileName.endsWith(".csv"))
+                return CommonResult.fail(ErrorCodeEnum.FILE_FORMAT_ERROR);
+
+            return CommonResult.createOK(scheduleService.importExcel(file));
+        } catch (Exception e) {
+            logger.error("FileController#excelImportCourses error", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(value = "/excelExport/schedules", method = RequestMethod.GET)
     public void excelExport(HttpServletResponse response, SchedulesPageReq req) {
         try {

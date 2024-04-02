@@ -57,6 +57,9 @@ public class SchedulesRes {
     @Excel(name = "备注")
     private String notes;
 
+//    @Excel(name = "是否思政课程")
+    private Boolean isPolitics;
+
     @Excel(name = "评级")
     private String evaluation;
 }

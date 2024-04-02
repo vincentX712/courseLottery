@@ -12,6 +12,7 @@ import com.officerschool.courselottery.dao.dataobject.CourseDO;
 import com.officerschool.courselottery.dao.mapper.CourseMapper;
 import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
+import com.officerschool.courselottery.service.utils.ScheduleUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
         if (StringUtils.isNotBlank(req.getDate()))
             sql += "date='" + req.getDate() + "' ";
         else
-            sql += "date='" + TimeUtil.getCurrentDate() + "' ";
+            sql += "date>='" + TimeUtil.getCurrentDate() + "' ";
 
         if (StringUtils.isNotBlank(req.getTeacherTitle()))
             sql += " and teacher_title like '%" + req.getTeacherTitle() + "%' ";
@@ -65,6 +66,9 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
             sql += " and node_id='" + req.getNodeId() + "' ";
         }
 
+        if(req.getIsPolitics()){
+            sql += " and lesson in " + ScheduleUtil.politicsLesson;
+        }
         sql += " order by node_id";
         List<Map<String, Object>> courseList = courseMapper.getCoursesList(sql);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(courseList);
@@ -94,6 +98,7 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
             CoursesRes res = new CoursesRes();
             res.setId(Integer.valueOf(mapItem.get("id").toString()));
             res.setLesson(mapItem.get("lesson").toString());
+            res.setIsPolitics(ScheduleUtil.politicsLesson.contains(mapItem.get("lesson").toString()));
             res.setWeek(mapItem.get("week").toString());
             res.setDate(mapItem.get("date").toString());
             res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));

@@ -136,12 +136,12 @@ public class LotteryService {
         CourseDO course = courseMapper.selectOne(queryWrapper);
         QueryWrapper<ScheduleDO> queryWrapper1 = new QueryWrapper<>();
         queryWrapper1.eq("course_id", req.getCourseId());
-        queryWrapper1.eq("expert_id", req.getExpertId());
+//        queryWrapper1.eq("expert_id", req.getExpertId());
         ConfirmLotteryRes res = new ConfirmLotteryRes();
         List<ScheduleDO> sche = scheduleMapper.selectList(queryWrapper1);
         if(!sche.isEmpty()){
             res.setRes(false);
-            res.setMsg("该专家已抽取过该课，请抽取其他课！");
+            res.setMsg("该课程已被其他专家抽取，请抽取其他课！");
         }else{
             ScheduleDO schedule = new ScheduleDO();
             schedule.setExpertId(req.getExpertId());

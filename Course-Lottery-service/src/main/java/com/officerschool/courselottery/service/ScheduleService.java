@@ -1,8 +1,11 @@
 package com.officerschool.courselottery.service;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.officerschool.courselottery.common.Utils.TimeUtil;
@@ -10,14 +13,18 @@ import com.officerschool.courselottery.common.models.req.ScheduleDeleteReq;
 import com.officerschool.courselottery.common.models.req.SchedulesPageReq;
 import com.officerschool.courselottery.common.models.res.ScheduleDeleteRes;
 import com.officerschool.courselottery.common.models.res.SchedulesRes;
+import com.officerschool.courselottery.dao.dataobject.CourseDO;
 import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
+import com.officerschool.courselottery.dao.mapper.CourseMapper;
 import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
+import com.officerschool.courselottery.service.utils.ScheduleUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -33,7 +40,7 @@ import java.util.Map;
  */
 
 @Service
-public class ScheduleService {
+public class ScheduleService extends ServiceImpl<ScheduleMapper, ScheduleDO> {
 
     private final Logger logger = LoggerFactory.getLogger(ScheduleService.class);
 
@@ -46,24 +53,7 @@ public class ScheduleService {
 
         PageHelper.startPage(pageNum, pageSize);
 
-        String sql = "select * , t_expert.name as e_name from t_schedule " +
-                "left join t_course on t_schedule.course_id = t_course.id " +
-                "left join t_expert on t_schedule.expert_id = t_expert.id " +
-                "where ";
-        if (StringUtils.isNotBlank(req.getDate()))
-            sql += "t_course.date='" + req.getDate() + "'";
-        else
-            sql += "t_course.date='" + TimeUtil.getCurrentDate() + "' ";
-
-        if (StringUtils.isNotBlank(req.getTeacherTitle()))
-            sql += " and t_course.teacher_title='" + req.getTeacherTitle() + "' ";
-
-        if (StringUtils.isNotBlank(req.getLesson()))
-            sql += " and t_course.lesson like '%" + req.getLesson() + "%' ";
-
-        if (StringUtils.isNotBlank(req.getMajor()))
-            sql += " and t_course.major like '%" + req.getMajor() + " %' ";
-        sql += "order by t_schedule.expert_id";
+        String sql = new ScheduleUtil().getSchedulesSql(req);
         List<Map<String, Object>> list = scheduleMapper.getScheduleList(sql);
 
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(list);
@@ -71,27 +61,7 @@ public class ScheduleService {
 
         List<SchedulesRes> resList = new ArrayList<>();
         for (Map<String, Object> mapItem : list) {
-            SchedulesRes res = new SchedulesRes();
-            res.setId(Integer.valueOf(mapItem.get("id").toString()));
-            res.setCourseId(Integer.valueOf(mapItem.get("course_id").toString()));
-            res.setExpertId(Integer.valueOf(mapItem.get("expert_id").toString()));
-//            res.setTeacherId(Integer.valueOf(mapItem.get("teacher_id").toString()));
-            res.setEvaluation(mapItem.get("evaluation") == null ? "" : mapItem.get("evaluation").toString());
-            res.setDate(mapItem.get("date") == null ? "" : mapItem.get("date").toString());
-            res.setWeek(mapItem.get("week") == null ? "" : mapItem.get("week").toString());
-            res.setLesson(mapItem.get("lesson").toString());
-            res.setMajor(mapItem.get("major").toString());
-            res.setCampusName(mapItem.get("campus_name").toString());
-            res.setClassroom(mapItem.get("classroom").toString());
-            res.setTeacherName(mapItem.get("teacher_name").toString());
-            res.setTitle(mapItem.get("teacher_title").toString());
-            res.setEducation(mapItem.get("teacher_education").toString());
-            res.setAge(mapItem.get("teacher_age").toString());
-            res.setExpertName(mapItem.get("e_name").toString());
-            res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
-            if(mapItem.get("notes")!=null){
-                res.setNotes(mapItem.get("notes").toString());
-            }
+            SchedulesRes res = setSchedule(mapItem);
             resList.add(res);
         }
         resPage.setList(resList);
@@ -133,52 +103,14 @@ public class ScheduleService {
     }
 
     private List<SchedulesRes> getSchedulesExecel(SchedulesPageReq req) {
-        String sql = "select * ,  t_expert.name as e_name from t_schedule " +
-                "left join t_course on t_schedule.course_id = t_course.id " +
-                "left join t_expert on t_schedule.expert_id = t_expert.id " + "where ";
-        if (StringUtils.isNotBlank(req.getDate()))
-            sql += "t_course.date='" + req.getDate() + "' ";
-        else
-            sql += "t_course.date='" + TimeUtil.getCurrentDate() + "' ";
-
-        if (StringUtils.isNotBlank(req.getTeacherTitle()))
-            sql += " and t_course.teacher_title like '%'" + req.getTeacherTitle() + "%' ";
-
-        if (StringUtils.isNotBlank(req.getLesson()))
-            sql += " and t_course.lesson like '%" + req.getLesson() + "%' ";
-
-        if (StringUtils.isNotBlank(req.getMajor()))
-            sql += " and t_course.major like '%" + req.getMajor() + " %' ";
-        sql += "order by t_schedule.expert_id";
-
+        String sql = new ScheduleUtil().getSchedulesSql(req);
         List<Map<String, Object>> list = scheduleMapper.getScheduleList(sql);
 
         List<SchedulesRes> resList = new ArrayList<>();
         for (Map<String, Object> mapItem : list) {
-            SchedulesRes res = new SchedulesRes();
-            res.setId(Integer.valueOf(mapItem.get("id").toString()));
-            res.setCourseId(Integer.valueOf(mapItem.get("course_id").toString()));
-            res.setExpertId(Integer.valueOf(mapItem.get("expert_id").toString()));
-//            res.setTeacherId(Integer.valueOf(mapItem.get("teacher_id").toString()));
-            res.setEvaluation(mapItem.get("evaluation") == null ? "" : mapItem.get("evaluation").toString());
-            res.setDate(mapItem.get("date") == null ? "" : mapItem.get("date").toString());
-            res.setWeek(mapItem.get("week") == null ? "" : mapItem.get("week").toString());
-            res.setLesson(mapItem.get("lesson").toString());
-            res.setMajor(mapItem.get("major").toString());
-            res.setCampusName(mapItem.get("campus_name").toString());
-            res.setClassroom(mapItem.get("classroom").toString());
-            res.setTeacherName(mapItem.get("teacher_name").toString());
-            res.setTitle(mapItem.get("teacher_title").toString());
-            res.setEducation(mapItem.get("teacher_education").toString());
-            res.setAge(mapItem.get("teacher_age").toString());
-            res.setExpertName(mapItem.get("e_name").toString());
-            res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
-            if(mapItem.get("notes")!=null){
-                res.setNotes(mapItem.get("notes").toString());
-            }
+            SchedulesRes res = setSchedule(mapItem);
             resList.add(res);
         }
-
         return resList;
     }
 
@@ -196,5 +128,38 @@ public class ScheduleService {
 
         return res;
     }
-
+    public boolean importExcel(MultipartFile file) {
+        try {
+            List<ScheduleDO> result = ExcelImportUtil.importExcel(file.getInputStream(), ScheduleDO.class, new ImportParams());
+            return saveBatch(result);
+        } catch (Exception e) {
+            logger.error("CourseService#importExcel error: ", e);
+            return false;
+        }
+    }
+    private SchedulesRes setSchedule(Map<String, Object> mapItem){
+        SchedulesRes res = new SchedulesRes();
+        res.setId(Integer.valueOf(mapItem.get("id").toString()));
+        res.setCourseId(Integer.valueOf(mapItem.get("course_id").toString()));
+        res.setExpertId(Integer.valueOf(mapItem.get("expert_id").toString()));
+//            res.setTeacherId(Integer.valueOf(mapItem.get("teacher_id").toString()));
+        res.setEvaluation(mapItem.get("evaluation") == null ? "" : mapItem.get("evaluation").toString());
+        res.setDate(mapItem.get("date") == null ? "" : mapItem.get("date").toString());
+        res.setWeek(mapItem.get("week") == null ? "" : mapItem.get("week").toString());
+        res.setLesson(mapItem.get("lesson").toString());
+        res.setMajor(mapItem.get("major").toString());
+        res.setCampusName(mapItem.get("campus_name").toString());
+        res.setClassroom(mapItem.get("classroom").toString());
+        res.setTeacherName(mapItem.get("teacher_name").toString());
+        res.setTitle(mapItem.get("teacher_title").toString());
+        res.setEducation(mapItem.get("teacher_education").toString());
+        res.setAge(mapItem.get("teacher_age").toString());
+        res.setExpertName(mapItem.get("e_name").toString());
+        res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
+        if(mapItem.get("notes")!=null){
+            res.setNotes(mapItem.get("notes").toString());
+        }
+        res.setIsPolitics(ScheduleUtil.politicsLesson.contains(mapItem.get("lesson").toString()));
+        return res;
+    }
 }

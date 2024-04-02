@@ -36,4 +36,6 @@ public class CoursesRes {
 
     private String expertName;
 
+    private Boolean isPolitics;
+
 }
