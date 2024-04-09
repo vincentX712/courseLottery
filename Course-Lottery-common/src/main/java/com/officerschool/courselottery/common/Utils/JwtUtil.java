@@ -5,13 +5,14 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.officerschool.courselottery.common.models.dto.UserInfo;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author : create by xiangwenchao@zhejianglab.com
+ * @author : create by anyuxin
  * @version : v1.0
  * @date : 2024/4/3
  */
@@ -29,24 +30,23 @@ public class JwtUtil {
     /**
      * 生成用户token,设置token超时时间
      */
-//    public static String createToken(UserInfo user) {
-//        //过期时间
-//        Date expireDate = new Date(System.currentTimeMillis() + EXPIRATION * 1000);
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("alg", "HS256");
-//        map.put("typ", "JWT");
-//        String token = JWT.create()
-//                .withHeader(map)// 添加头部
-//                //可以将基本信息放到claims中
-//                .withClaim("id", user.getId())//userId
-//                .withClaim("phone", user.getPhone())//phone
-//                .withClaim("name", user.getName())//name
-//                .withClaim("roleId", user.getRoleId())
-//                .withExpiresAt(expireDate) //超时设置,设置过期的日期
-//                .withIssuedAt(new Date()) //签发时间
-//                .sign(Algorithm.HMAC256(SECRET)); //SECRET加密
-//        return token;
-//    }
+    public static String createToken(UserInfo user) {
+        //过期时间
+        Date expireDate = new Date(System.currentTimeMillis() + EXPIRATION * 1000);
+        Map<String, Object> map = new HashMap<>();
+        map.put("alg", "HS256");
+        map.put("typ", "JWT");
+        String token = JWT.create()
+                .withHeader(map)// 添加头部
+                //可以将基本信息放到claims中
+                .withClaim("id", user.getId())//userId
+                .withClaim("phone", user.getPhone())//phone
+                .withClaim("name", user.getName())//name
+                .withExpiresAt(expireDate) //超时设置,设置过期的日期
+                .withIssuedAt(new Date()) //签发时间
+                .sign(Algorithm.HMAC256(SECRET)); //SECRET加密
+        return token;
+    }
 
     /**
      * 校验token并解析token
