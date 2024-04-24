@@ -2,13 +2,17 @@ package com.officerschool.courselottery.service;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.officerschool.courselottery.common.Utils.TimeUtil;
+import com.officerschool.courselottery.common.models.req.CourseDeleteReq;
 import com.officerschool.courselottery.common.models.req.CoursesPageReq;
 import com.officerschool.courselottery.common.models.res.CoursesRes;
+import com.officerschool.courselottery.common.models.res.DeleteRes;
 import com.officerschool.courselottery.dao.dataobject.CourseDO;
+import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
 import com.officerschool.courselottery.dao.mapper.CourseMapper;
 import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
@@ -51,6 +55,9 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
 
         if (StringUtils.isNotBlank(req.getTeacherTitle()))
             sql += " and teacher_title like '%" + req.getTeacherTitle() + "%' ";
+
+        if (StringUtils.isNotBlank(req.getTeacherName()))
+            sql += " and teacher_name like '%" + req.getTeacherName() + "%' ";
 
         if (StringUtils.isNotBlank(req.getLesson()))
             sql += " and lesson like '%" + req.getLesson() + "%' ";
@@ -97,8 +104,10 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
         for (Map<String, Object> mapItem : courseList) {
             CoursesRes res = new CoursesRes();
             res.setId(Integer.valueOf(mapItem.get("id").toString()));
-            res.setLesson(mapItem.get("lesson").toString());
-            res.setIsPolitics(ScheduleUtil.politicsLesson.contains(mapItem.get("lesson").toString()));
+            if(mapItem.get("lesson")!=null){
+                res.setLesson(mapItem.get("lesson").toString());
+                res.setIsPolitics(ScheduleUtil.politicsLesson.contains(mapItem.get("lesson").toString()));
+            }
             res.setWeek(mapItem.get("week").toString());
             res.setDate(mapItem.get("date").toString());
             res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
@@ -111,6 +120,9 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
             res.setCampusName(mapItem.get("campus_name").toString());
             if(mapItem.get("notes")!=null){
                 res.setNotes(mapItem.get("notes").toString());
+            }
+            if(mapItem.get("lesson_attribute")!=null){
+                res.setLessonAttribute(mapItem.get("lesson_attribute").toString());
             }
             res.setExpertName(courseIdExpertNameMap.get(mapItem.get("id").toString()));
             resList.add(res);
@@ -127,5 +139,24 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
             logger.error("CourseService#importExcel error: ", e);
             return false;
         }
+    }
+
+    public DeleteRes deleteCourse(CourseDeleteReq req){
+        QueryWrapper<CourseDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", req.getCourseId());
+        DeleteRes res = new DeleteRes();
+        QueryWrapper<ScheduleDO> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("course_id", req.getCourseId());
+        if(courseMapper.selectCount(queryWrapper)==0){
+            res.setRes(false);
+            res.setMsg("课程不存在，请重试！");
+        }else if (scheduleMapper.selectCount(queryWrapper1)>0){
+            res.setRes(false);
+            res.setMsg("该课已有专家抽取，请先删除听课计划！");
+        }else{
+            res.setRes(courseMapper.delete(queryWrapper) > 0);
+            res.setMsg("成功");
+        }
+        return res;
     }
 }

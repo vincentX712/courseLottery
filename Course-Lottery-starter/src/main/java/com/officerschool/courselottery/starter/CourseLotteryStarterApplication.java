@@ -14,7 +14,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {"com.officerschool*"})
 @SpringBootApplication
 @MapperScan("com.officerschool.courselottery.dao.mapper")
-@ServletComponentScan(basePackages = "com.officerschool.courselottery.web.filter")
+//@ServletComponentScan(basePackages = "com.officerschool.courselottery.web.filter")
 public class CourseLotteryStarterApplication {
 
     public static void main(String[] args) {

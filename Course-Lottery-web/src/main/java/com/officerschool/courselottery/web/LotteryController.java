@@ -51,6 +51,24 @@ public class LotteryController {
         }
     }
 
+    @RequestMapping(value = "/expert/insert", method = RequestMethod.POST)
+    public CommonResult expertInsert(@RequestBody ExpertReq req){
+        try {
+            return CommonResult.createOK(expertService.expertInsert(req));
+        } catch (Exception e) {
+            logger.error("LotteryController#experts error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+    @RequestMapping(value = "/expert/modify", method = RequestMethod.POST)
+    public CommonResult expertModify(@RequestBody ExpertReq req){
+        try {
+            return CommonResult.createOK(expertService.expertModify(req));
+        } catch (Exception e) {
+            logger.error("LotteryController#experts error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
 
     @RequestMapping(value = "/lottery", method = RequestMethod.POST)
     public CommonResult lottery(@RequestBody LotteryReq req) {
@@ -110,4 +128,13 @@ public class LotteryController {
         }
     }
 
+    @RequestMapping(value = "/course/delete", method = RequestMethod.POST)
+    public CommonResult courseDelete(@RequestBody CourseDeleteReq req) {
+        try {
+            return CommonResult.createOK(courseService.deleteCourse(req));
+        } catch (Exception e) {
+            logger.error("LotteryController#schedules error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
 }

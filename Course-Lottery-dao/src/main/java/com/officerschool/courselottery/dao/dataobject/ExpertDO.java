@@ -18,4 +18,10 @@ public class ExpertDO {
 
     @Excel(name = "专家姓名")
     private String name;
+
+    private String relateMajor;
+
+    private Integer priority;
+
+    private Integer status;
 }

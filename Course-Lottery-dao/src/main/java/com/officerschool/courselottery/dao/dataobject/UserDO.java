@@ -27,7 +27,7 @@ public class UserDO {
 
     private String token;
 
-    private Timestamp createTime;
+    private Timestamp ctime;
 
-    private Timestamp updateTime;
+    private Timestamp mtime;
 }

@@ -36,6 +36,9 @@ public class CourseDO {
     @Excel(name = "课程名称")
     private String lesson;
 
+    @Excel(name = "课程属性")
+    private String lessonAttribute;
+
     @Excel(name = "专业（人数）")
     private String major;
 

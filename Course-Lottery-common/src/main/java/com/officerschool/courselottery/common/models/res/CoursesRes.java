@@ -16,6 +16,8 @@ public class CoursesRes {
 
     private String lesson;
 
+    private String lessonAttribute;
+
     private String major;
 
     private String campusName;

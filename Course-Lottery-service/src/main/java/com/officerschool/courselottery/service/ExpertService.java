@@ -4,8 +4,10 @@ import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.officerschool.courselottery.common.models.req.ExpertReq;
 import com.officerschool.courselottery.common.models.req.ExpertsPageReq;
 import com.officerschool.courselottery.common.models.res.ExpertRes;
+import com.officerschool.courselottery.common.models.res.ModifyExpertRes;
 import com.officerschool.courselottery.dao.dataobject.ExpertDO;
 import com.officerschool.courselottery.dao.mapper.ExpertMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
@@ -39,7 +41,11 @@ public class ExpertService extends ServiceImpl<ExpertMapper, ExpertDO> {
 
         PageHelper.startPage(pageNum, pageSize);
         QueryWrapper<ExpertDO> queryWrapper = new QueryWrapper<>();
-
+        if(req.getStatus()!=null){
+            queryWrapper.eq("status",req.getStatus());
+        }
+        queryWrapper.orderByDesc("status");
+        queryWrapper.orderByAsc("priority");
         List<ExpertDO> expertList = expertMapper.selectList(queryWrapper);
         PageInfo<ExpertDO> pageInfo = new PageInfo<>(expertList);
         PageInfo<ExpertRes> resPage = PageUtil.convertPageInfo2PageInfoVo(pageInfo);
@@ -49,12 +55,54 @@ public class ExpertService extends ServiceImpl<ExpertMapper, ExpertDO> {
             ExpertRes res = new ExpertRes();
             res.setId(expertDO.getId());
             res.setName(expertDO.getName());
+            res.setPriority(expertDO.getPriority());
+            res.setStatus(expertDO.getStatus());
+            res.setRelateMajor(expertDO.getRelateMajor());
             resList.add(res);
         }
         resPage.setList(resList);
         return resPage;
     }
-
+    public ModifyExpertRes expertInsert(ExpertReq req){
+        ExpertDO expert = new ExpertDO();
+        if(req.getName()!=null){
+            expert.setName(req.getName());
+        }
+        if(req.getStatus()!=null){
+            expert.setStatus(req.getStatus());
+        }
+        if(req.getPriority()!=null){
+            expert.setPriority(req.getPriority());
+        }
+        if(req.getRelateMajor()!=null){
+            expert.setRelateMajor(req.getRelateMajor());
+        }
+        ModifyExpertRes res = new ModifyExpertRes();
+        res.setRes(expertMapper.insert(expert));
+        res.setMsg("成功");
+        return res;
+    }
+    public ModifyExpertRes expertModify(ExpertReq req){
+        QueryWrapper<ExpertDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", req.getId());
+        ExpertDO expert = expertMapper.selectOne(queryWrapper);
+        if(req.getName()!=null){
+            expert.setName(req.getName());
+        }
+        if(req.getStatus()!=null){
+            expert.setStatus(req.getStatus());
+        }
+        if(req.getPriority()!=null){
+            expert.setPriority(req.getPriority());
+        }
+        if(req.getRelateMajor()!=null){
+            expert.setRelateMajor(req.getRelateMajor());
+        }
+        ModifyExpertRes res = new ModifyExpertRes();
+        res.setRes(expertMapper.updateById(expert));
+        res.setMsg("成功");
+        return res;
+    }
     public boolean importExcel(MultipartFile file) {
         try {
             List<ExpertDO> result = ExcelImportUtil.importExcel(file.getInputStream(), ExpertDO.class, new ImportParams());

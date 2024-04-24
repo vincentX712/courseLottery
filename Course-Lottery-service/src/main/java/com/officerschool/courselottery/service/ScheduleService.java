@@ -8,18 +8,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.officerschool.courselottery.common.Utils.TimeUtil;
 import com.officerschool.courselottery.common.models.req.ScheduleDeleteReq;
 import com.officerschool.courselottery.common.models.req.SchedulesPageReq;
-import com.officerschool.courselottery.common.models.res.ScheduleDeleteRes;
+import com.officerschool.courselottery.common.models.res.DeleteRes;
 import com.officerschool.courselottery.common.models.res.SchedulesRes;
-import com.officerschool.courselottery.dao.dataobject.CourseDO;
 import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
-import com.officerschool.courselottery.dao.mapper.CourseMapper;
 import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
 import com.officerschool.courselottery.service.utils.ScheduleUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,10 +110,10 @@ public class ScheduleService extends ServiceImpl<ScheduleMapper, ScheduleDO> {
         return resList;
     }
 
-    public ScheduleDeleteRes deleteSchedule(ScheduleDeleteReq req){
+    public DeleteRes deleteSchedule(ScheduleDeleteReq req){
         QueryWrapper<ScheduleDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", req.getScheduleId());
-        ScheduleDeleteRes res = new ScheduleDeleteRes();
+        DeleteRes res = new DeleteRes();
         if(scheduleMapper.selectCount(queryWrapper)>0){
             res.setRes(scheduleMapper.delete(queryWrapper) > 0);
             res.setMsg("成功");
@@ -125,7 +121,6 @@ public class ScheduleService extends ServiceImpl<ScheduleMapper, ScheduleDO> {
             res.setRes(false);
             res.setMsg("计划不存在，请重试！");
         }
-
         return res;
     }
     public boolean importExcel(MultipartFile file) {
@@ -158,6 +153,9 @@ public class ScheduleService extends ServiceImpl<ScheduleMapper, ScheduleDO> {
         res.setNodeId(Integer.valueOf(mapItem.get("node_id").toString()));
         if(mapItem.get("notes")!=null){
             res.setNotes(mapItem.get("notes").toString());
+        }
+        if(mapItem.get("lesson_attribute")!=null){
+            res.setLessonAttribute(mapItem.get("lesson_attribute").toString());
         }
         res.setIsPolitics(ScheduleUtil.politicsLesson.contains(mapItem.get("lesson").toString()));
         return res;

@@ -14,4 +14,6 @@ public class ExpertsPageReq {
     private Integer pageNum;
 
     private Integer pageSize;
+
+    private Integer status;
 }

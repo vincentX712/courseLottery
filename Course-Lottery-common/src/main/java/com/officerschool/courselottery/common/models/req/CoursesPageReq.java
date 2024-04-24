@@ -16,6 +16,8 @@ public class CoursesPageReq {
 
     private String teacherTitle;
 
+    private String teacherName;
+
     private String date; // 默认当天
 
     private String lesson; // 课程名，支持模糊查询

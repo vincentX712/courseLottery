@@ -40,7 +40,7 @@ public class UserService {
         UserDO userDO = new UserDO();
         userDO.setToken(token);
         userDO.setId(userId);
-        userDO.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+        userDO.setMtime(new Timestamp(System.currentTimeMillis()));
         return userMapper.updateById(userDO) > 0;
     }
 
@@ -48,7 +48,7 @@ public class UserService {
         UserDO userDO = new UserDO();
         userDO.setToken("expired");
         userDO.setId(id);
-        userDO.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+        userDO.setMtime(new Timestamp(System.currentTimeMillis()));
         return userMapper.updateById(userDO) > 0;
     }
 

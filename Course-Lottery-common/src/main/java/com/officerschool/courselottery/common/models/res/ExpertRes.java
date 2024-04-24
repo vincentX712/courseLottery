@@ -13,4 +13,10 @@ public class ExpertRes {
     private Integer id;
 
     private String name;
+
+    private String relateMajor;
+
+    private Integer priority;
+
+    private Integer status;
 }
