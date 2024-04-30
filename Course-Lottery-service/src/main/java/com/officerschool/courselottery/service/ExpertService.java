@@ -4,12 +4,16 @@ import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.officerschool.courselottery.common.models.req.DeleteReq;
 import com.officerschool.courselottery.common.models.req.ExpertReq;
 import com.officerschool.courselottery.common.models.req.ExpertsPageReq;
+import com.officerschool.courselottery.common.models.res.DeleteRes;
 import com.officerschool.courselottery.common.models.res.ExpertRes;
 import com.officerschool.courselottery.common.models.res.ModifyExpertRes;
 import com.officerschool.courselottery.dao.dataobject.ExpertDO;
+import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
 import com.officerschool.courselottery.dao.mapper.ExpertMapper;
+import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +39,8 @@ public class ExpertService extends ServiceImpl<ExpertMapper, ExpertDO> {
     @Resource
     private ExpertMapper expertMapper;
 
+    @Resource
+    private ScheduleMapper scheduleMapper;
     public PageInfo<ExpertRes> getExpertList(ExpertsPageReq req) {
         int pageNum = req.getPageNum() == null ? 1 : req.getPageNum();
         int pageSize = req.getPageSize() == null ? 10 : req.getPageSize();
@@ -111,5 +117,23 @@ public class ExpertService extends ServiceImpl<ExpertMapper, ExpertDO> {
             logger.error("ExpertService#importExcel error: ", e);
             return false;
         }
+    }
+    public DeleteRes deleteExpert(DeleteReq req){
+        QueryWrapper<ExpertDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", req.getId());
+        DeleteRes res = new DeleteRes();
+        QueryWrapper<ScheduleDO> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("expert_id", req.getId());
+        if(expertMapper.selectCount(queryWrapper)==0){
+            res.setRes(false);
+            res.setMsg("专家不存在，请重试！");
+        }else if (scheduleMapper.selectCount(queryWrapper1)>0){
+            res.setRes(false);
+            res.setMsg("该专家已抽取，不可删除！");
+        }else{
+            res.setRes(expertMapper.delete(queryWrapper) > 0);
+            res.setMsg("成功");
+        }
+        return res;
     }
 }

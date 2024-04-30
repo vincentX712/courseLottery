@@ -109,7 +109,7 @@ public class LotteryController {
     }
 
     @RequestMapping(value = "/schedule/delete", method = RequestMethod.POST)
-    public CommonResult scheduleDelete(@RequestBody ScheduleDeleteReq req) {
+    public CommonResult scheduleDelete(@RequestBody DeleteReq req) {
         try {
             return CommonResult.createOK(scheduleService.deleteSchedule(req));
         } catch (Exception e) {
@@ -129,9 +129,19 @@ public class LotteryController {
     }
 
     @RequestMapping(value = "/course/delete", method = RequestMethod.POST)
-    public CommonResult courseDelete(@RequestBody CourseDeleteReq req) {
+    public CommonResult courseDelete(@RequestBody DeleteReq req) {
         try {
             return CommonResult.createOK(courseService.deleteCourse(req));
+        } catch (Exception e) {
+            logger.error("LotteryController#schedules error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/expert/delete", method = RequestMethod.POST)
+    public CommonResult expertDelete(@RequestBody DeleteReq req) {
+        try {
+            return CommonResult.createOK(expertService.deleteExpert(req));
         } catch (Exception e) {
             logger.error("LotteryController#schedules error: ", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);

@@ -7,8 +7,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.officerschool.courselottery.common.Utils.TimeUtil;
-import com.officerschool.courselottery.common.models.req.CourseDeleteReq;
 import com.officerschool.courselottery.common.models.req.CoursesPageReq;
+import com.officerschool.courselottery.common.models.req.DeleteReq;
 import com.officerschool.courselottery.common.models.res.CoursesRes;
 import com.officerschool.courselottery.common.models.res.DeleteRes;
 import com.officerschool.courselottery.dao.dataobject.CourseDO;
@@ -51,7 +51,7 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
         if (StringUtils.isNotBlank(req.getDate()))
             sql += "date='" + req.getDate() + "' ";
         else
-            sql += "date>='" + TimeUtil.getCurrentDate() + "' ";
+            sql += "date='" + TimeUtil.getCurrentDate() + "' ";
 
         if (StringUtils.isNotBlank(req.getTeacherTitle()))
             sql += " and teacher_title like '%" + req.getTeacherTitle() + "%' ";
@@ -141,12 +141,12 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
         }
     }
 
-    public DeleteRes deleteCourse(CourseDeleteReq req){
+    public DeleteRes deleteCourse(DeleteReq req){
         QueryWrapper<CourseDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", req.getCourseId());
+        queryWrapper.eq("id", req.getId());
         DeleteRes res = new DeleteRes();
         QueryWrapper<ScheduleDO> queryWrapper1 = new QueryWrapper<>();
-        queryWrapper1.eq("course_id", req.getCourseId());
+        queryWrapper1.eq("course_id", req.getId());
         if(courseMapper.selectCount(queryWrapper)==0){
             res.setRes(false);
             res.setMsg("课程不存在，请重试！");

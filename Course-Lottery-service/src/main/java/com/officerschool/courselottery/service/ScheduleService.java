@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.officerschool.courselottery.common.models.req.ScheduleDeleteReq;
+import com.officerschool.courselottery.common.models.req.DeleteReq;
 import com.officerschool.courselottery.common.models.req.SchedulesPageReq;
 import com.officerschool.courselottery.common.models.res.DeleteRes;
 import com.officerschool.courselottery.common.models.res.SchedulesRes;
@@ -110,9 +110,9 @@ public class ScheduleService extends ServiceImpl<ScheduleMapper, ScheduleDO> {
         return resList;
     }
 
-    public DeleteRes deleteSchedule(ScheduleDeleteReq req){
+    public DeleteRes deleteSchedule(DeleteReq req){
         QueryWrapper<ScheduleDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", req.getScheduleId());
+        queryWrapper.eq("id", req.getId());
         DeleteRes res = new DeleteRes();
         if(scheduleMapper.selectCount(queryWrapper)>0){
             res.setRes(scheduleMapper.delete(queryWrapper) > 0);
