@@ -24,7 +24,9 @@ public class JwtFilter implements Filter {
 
     @Resource
     private UserMapper userMapper;
-    private static final Set<String> ALLOWED_PATHS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("/api/user/login")));
+    private static final Set<String> ALLOWED_PATHS =
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList("/lottery/user/login","/lottery/qualityEvaluation/teacher/score/commit"
+            ,"/lottery/qualityEvaluation/teacher/list")));
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

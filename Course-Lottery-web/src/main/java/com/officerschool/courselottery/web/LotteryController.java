@@ -42,7 +42,7 @@ public class LotteryController {
     private CourseService courseService;
 
     @RequestMapping(value = "/experts", method = RequestMethod.GET)
-    public CommonResult experts(ExpertsPageReq req) {
+    public CommonResult experts(PageReq req) {
         try {
             return CommonResult.createOK(expertService.getExpertList(req));
         } catch (Exception e) {

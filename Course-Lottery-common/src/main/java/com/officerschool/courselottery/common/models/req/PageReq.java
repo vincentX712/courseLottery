@@ -1,7 +1,6 @@
 package com.officerschool.courselottery.common.models.req;
 
 import lombok.Data;
-import org.springframework.asm.SpringAsmInfo;
 
 /**
  * @author : create by anyuxin
@@ -9,11 +8,13 @@ import org.springframework.asm.SpringAsmInfo;
  * @date : 2023/12/20
  */
 @Data
-public class ExpertsPageReq {
+public class PageReq {
 
     private Integer pageNum;
 
     private Integer pageSize;
 
     private Integer status;
+
+    private Integer classId;
 }

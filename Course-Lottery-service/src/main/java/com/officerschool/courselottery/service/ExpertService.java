@@ -6,10 +6,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.officerschool.courselottery.common.models.req.DeleteReq;
 import com.officerschool.courselottery.common.models.req.ExpertReq;
-import com.officerschool.courselottery.common.models.req.ExpertsPageReq;
+import com.officerschool.courselottery.common.models.req.PageReq;
 import com.officerschool.courselottery.common.models.res.DeleteRes;
 import com.officerschool.courselottery.common.models.res.ExpertRes;
-import com.officerschool.courselottery.common.models.res.ModifyExpertRes;
+import com.officerschool.courselottery.common.models.res.ModifyRes;
 import com.officerschool.courselottery.dao.dataobject.ExpertDO;
 import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
 import com.officerschool.courselottery.dao.mapper.ExpertMapper;
@@ -41,7 +41,7 @@ public class ExpertService extends ServiceImpl<ExpertMapper, ExpertDO> {
 
     @Resource
     private ScheduleMapper scheduleMapper;
-    public PageInfo<ExpertRes> getExpertList(ExpertsPageReq req) {
+    public PageInfo<ExpertRes> getExpertList(PageReq req) {
         int pageNum = req.getPageNum() == null ? 1 : req.getPageNum();
         int pageSize = req.getPageSize() == null ? 10 : req.getPageSize();
 
@@ -69,7 +69,7 @@ public class ExpertService extends ServiceImpl<ExpertMapper, ExpertDO> {
         resPage.setList(resList);
         return resPage;
     }
-    public ModifyExpertRes expertInsert(ExpertReq req){
+    public ModifyRes expertInsert(ExpertReq req){
         ExpertDO expert = new ExpertDO();
         if(req.getName()!=null){
             expert.setName(req.getName());
@@ -83,12 +83,12 @@ public class ExpertService extends ServiceImpl<ExpertMapper, ExpertDO> {
         if(req.getRelateMajor()!=null){
             expert.setRelateMajor(req.getRelateMajor());
         }
-        ModifyExpertRes res = new ModifyExpertRes();
+        ModifyRes res = new ModifyRes();
         res.setRes(expertMapper.insert(expert));
         res.setMsg("成功");
         return res;
     }
-    public ModifyExpertRes expertModify(ExpertReq req){
+    public ModifyRes expertModify(ExpertReq req){
         QueryWrapper<ExpertDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", req.getId());
         ExpertDO expert = expertMapper.selectOne(queryWrapper);
@@ -104,7 +104,7 @@ public class ExpertService extends ServiceImpl<ExpertMapper, ExpertDO> {
         if(req.getRelateMajor()!=null){
             expert.setRelateMajor(req.getRelateMajor());
         }
-        ModifyExpertRes res = new ModifyExpertRes();
+        ModifyRes res = new ModifyRes();
         res.setRes(expertMapper.updateById(expert));
         res.setMsg("成功");
         return res;

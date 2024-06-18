@@ -6,26 +6,24 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-/**
- * @author : create by anyuxin
- * @version : v1.0
- * @date : 2023/12/20
- */
 @Data
-@TableName("t_teacher")
-public class TeacherDO {
+@TableName("t_class")
+public class ClassDO {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    @Excel(name = "教员姓名")
+    @Excel(name = "班次名称")
     private String name;
 
-    @Excel(name = "班次id")
-    private String classId;
+    @Excel(name = "状态")
+    private Integer status;
 
-    private Integer totalScore; //总分
+    private Integer teacherNum;
 
-    private Integer totalNum;//总人数
+    @Excel(name = "学年")
+    private String schoolYear;
 
+    @Excel(name = "学期")
+    private String schoolTerm;
 }

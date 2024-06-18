@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
  * @date : 2024/4/3
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/lottery/user")
 public class UserController {
 
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
