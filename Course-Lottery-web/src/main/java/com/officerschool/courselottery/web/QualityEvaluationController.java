@@ -38,6 +38,7 @@ public class QualityEvaluationController {
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }
+
     @RequestMapping(value = "/class/insert", method = RequestMethod.POST)
     public CommonResult classInsert(@RequestBody ClassReq req){
         try {
@@ -47,7 +48,28 @@ public class QualityEvaluationController {
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }
+    @RequestMapping(value = "/class/modify", method = RequestMethod.POST)
+    public CommonResult classModify(@RequestBody ClassReq req){
+        try {
+            return CommonResult.createOK(classService.classModify(req));
+        } catch (Exception e) {
+            logger.error("QualityEvaluationController#classInsert error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
 
+    @RequestMapping(value = "/class/delete", method = RequestMethod.POST)
+    public CommonResult classDelete(@RequestBody DeleteReq req){
+        try {
+            if(req.getId()==null){
+                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
+            }
+            return CommonResult.createOK(classService.classDelete(req.getId()));
+        } catch (Exception e) {
+            logger.error("QualityEvaluationController#teacherInsert error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
     @RequestMapping(value = "/teacherScore/list", method = RequestMethod.GET)
     public CommonResult classTeacherScore(Integer classId) {
         try {
@@ -90,6 +112,19 @@ public class QualityEvaluationController {
                 return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
             }
             return CommonResult.createOK(classService.teacherInsert(req));
+        } catch (Exception e) {
+            logger.error("QualityEvaluationController#teacherInsert error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/teacher/delete", method = RequestMethod.POST)
+    public CommonResult teacherDelete(@RequestBody DeleteReq req){
+        try {
+            if(req.getId()==null){
+                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
+            }
+            return CommonResult.createOK(classService.teacherDelete(req.getId()));
         } catch (Exception e) {
             logger.error("QualityEvaluationController#teacherInsert error: ", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);

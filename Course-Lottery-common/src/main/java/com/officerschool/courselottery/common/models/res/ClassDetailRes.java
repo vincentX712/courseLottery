@@ -9,4 +9,5 @@ public class ClassDetailRes {
     private ClassRes classRes;
 
     private List<TeacherRes> list;
+
 }

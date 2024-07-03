@@ -24,7 +24,7 @@ import javax.annotation.Resource;
  * @date : 2023/12/19
  */
 @RestController
-@RequestMapping("/lottery")
+@RequestMapping("/lottery/course")
 public class LotteryController {
 
     private final Logger logger = LoggerFactory.getLogger(LotteryController.class);

@@ -8,6 +8,7 @@ import com.officerschool.courselottery.dao.mapper.UserMapper;
 import javax.annotation.Resource;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,8 +26,24 @@ public class JwtFilter implements Filter {
     @Resource
     private UserMapper userMapper;
     private static final Set<String> ALLOWED_PATHS =
-            Collections.unmodifiableSet(new HashSet<>(Arrays.asList("/lottery/user/login","/lottery/qualityEvaluation/teacher/score/commit"
-            ,"/lottery/qualityEvaluation/teacher/list")));
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList("/lottery/user/login"
+                    ,"/lottery/qualityEvaluation/teacher/score/commit"
+                    ,"/lottery/qualityEvaluation/teacher/list"
+                    ,"/lottery/course/experts"
+                    ,"/lottery/course/expert/insert"
+                    ,"/lottery/course/expert/modify"
+                    ,"/lottery/course/expert/delete"
+                    ,"/lottery/course/lottery"
+                    ,"/lottery/course/confirm"
+                    ,"/lottery/course/schedules"
+                    ,"/lottery/course/schedule/delete"
+                    ,"/lottery/course/course/delete"
+                    ,"/lottery/course/courses"
+                    ,"/lottery/file/excelImport/experts"
+                    ,"/lottery/file/excelImport/courses"
+                    ,"/lottery/file/excelExport/schedules"
+                    ,"/lottery/share/shareUrl"
+                    ,"/lottery/share/originUrl")));
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -43,8 +60,17 @@ public class JwtFilter implements Filter {
 
         response.setCharacterEncoding("UTF-8");
         //获取 header里的token
-        final String token = request.getHeader("authorization");
-
+//        final String token = request.getHeader("authorization");
+        Cookie[] cookies = request.getCookies();
+        String token = new String();
+        // 遍历Cookie数组
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("token".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                }
+            }
+        }
         if ("OPTIONS".equals(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
             filterChain.doFilter(request, response);

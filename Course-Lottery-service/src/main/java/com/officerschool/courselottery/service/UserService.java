@@ -22,13 +22,13 @@ public class UserService {
     @Resource
     private UserMapper userMapper;
 
-    public UserInfo getUserInfo(String phone, String password) {
-        if (StringUtils.isBlank(phone) || StringUtils.isBlank(password)) {
+    public UserInfo getUserInfo(String userName, String password) {
+        if (StringUtils.isBlank(userName) || StringUtils.isBlank(password)) {
             return null;
         }
 
         QueryWrapper<UserDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("phone", phone);
+        queryWrapper.eq("name", userName);
         queryWrapper.eq("password", password);
         queryWrapper.eq("state", 0);
         return convertToUserInfo(userMapper.selectOne(queryWrapper));

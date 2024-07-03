@@ -5,6 +5,8 @@ import lombok.Data;
 @Data
 public class ClassReq {
 
+    private Integer id;
+
     private String name;
 
     private Integer status;

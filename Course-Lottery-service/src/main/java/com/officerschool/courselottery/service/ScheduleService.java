@@ -74,6 +74,10 @@ public class ScheduleService extends ServiceImpl<ScheduleMapper, ScheduleDO> {
             String fileName = "听课表.xlsx";
             //sheet名称
             String sheetName = "听课表";
+            if(req.getDate()!=null){
+                fileName="听课表"+req.getDate()+".xlsx";
+                sheetName=req.getDate();
+            }
             fileName = new String(fileName.getBytes(), "ISO-8859-1");
 
             //设置下载名称

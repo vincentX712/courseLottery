@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @TableName("t_class")
 public class ClassDO {
@@ -26,4 +28,6 @@ public class ClassDO {
 
     @Excel(name = "学期")
     private String schoolTerm;
+
+    private String otherSuggestion;
 }

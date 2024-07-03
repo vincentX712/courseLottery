@@ -8,4 +8,6 @@ public class ScoreCommitReq {
 
     private String score;
 
+    private String otherSuggestion;
+
 }

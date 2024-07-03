@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.officerschool.courselottery.common.models.req.*;
@@ -44,6 +45,8 @@ public class ClassService extends ServiceImpl<ScoreMapper, ScoreDO> {
     TeacherMapper teacherMapper;
     @Resource
     ScoreMapper scoreMapper;
+    @Resource
+    Cache<String, String> caffeineCache;
 
     public PageInfo<ClassRes> getClasses(PageReq req){
         int pageNum = req.getPageNum() == null ? 1 : req.getPageNum();
@@ -51,6 +54,7 @@ public class ClassService extends ServiceImpl<ScoreMapper, ScoreDO> {
 
         PageHelper.startPage(pageNum, pageSize);
         QueryWrapper<ClassDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("id");
         if(req.getStatus()!=null){
             queryWrapper.eq("status",req.getStatus());
         }
@@ -65,6 +69,7 @@ public class ClassService extends ServiceImpl<ScoreMapper, ScoreDO> {
             res.setStatus(classDO.getStatus());
             res.setSchoolTerm(classDO.getSchoolTerm());
             res.setSchoolYear(classDO.getSchoolYear());
+            res.setCipher(caffeineCache.getIfPresent(String.valueOf(classDO.getId())));
             resList.add(res);
         }
         resPage.setList(resList);
@@ -91,6 +96,7 @@ public class ClassService extends ServiceImpl<ScoreMapper, ScoreDO> {
         res.setTeacherNum(teacherNum);
         res.setSchoolTerm(classDO.getSchoolTerm());
         res.setSchoolYear(classDO.getSchoolYear());
+        res.setOtherSuggestions(classDO.getOtherSuggestion());
         return res;
     }
     public ModifyRes classInsert(ClassReq req){
@@ -111,7 +117,45 @@ public class ClassService extends ServiceImpl<ScoreMapper, ScoreDO> {
         res.setMsg("成功");
         return res;
     }
-
+    public ModifyRes classModify(ClassReq req){
+        ModifyRes res = new ModifyRes();
+        if(req.getId()==null || req.getName()==null || req.getSchoolYear()==null || req.getSchoolTerm()==null){
+            res.setRes(0);
+            res.setMsg("缺少参数，请重新确认");
+            return res;
+        }
+        ClassDO classDO = new ClassDO();
+        classDO.setId(req.getId());
+        classDO.setName(req.getName());
+        classDO.setSchoolTerm(req.getSchoolTerm());
+        classDO.setSchoolYear(req.getSchoolYear());
+        if(req.getStatus()!=null){
+            classDO.setStatus(req.getStatus());
+        }
+        QueryWrapper<ClassDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id",req.getId());
+        res.setRes(classMapper.update(classDO,queryWrapper));
+        res.setMsg("成功");
+        return res;
+    }
+    public DeleteRes classDelete(Integer classId){
+        QueryWrapper<ClassDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id",classId);
+        QueryWrapper<TeacherDO> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("class_id",classId);
+        DeleteRes res = new DeleteRes();
+        if(classMapper.selectCount(queryWrapper)==0){
+            res.setRes(false);
+            res.setMsg("班次不存在，请重试！");
+        }else if (teacherMapper.selectCount(queryWrapper1)>0){
+            res.setRes(false);
+            res.setMsg("该班次已添加教员，请先删除教员！");
+        }else{
+            res.setRes(classMapper.delete(queryWrapper) > 0);
+            res.setMsg("成功");
+        }
+        return res;
+    }
     public List<TeacherRes> getClassTeachersScore(Integer classId){
         QueryWrapper<TeacherDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("class_id",classId);
@@ -165,6 +209,24 @@ public class ClassService extends ServiceImpl<ScoreMapper, ScoreDO> {
         return res;
     }
 
+    public DeleteRes teacherDelete(Integer teacherId){
+        QueryWrapper<TeacherDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id",teacherId);
+        QueryWrapper<ScoreDO> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("teacher_id",teacherId);
+        DeleteRes res = new DeleteRes();
+        if(teacherMapper.selectCount(queryWrapper)==0){
+            res.setRes(false);
+            res.setMsg("教员不存在，请重试！");
+        }else if (scoreMapper.selectCount(queryWrapper1)>0){
+            res.setRes(false);
+            res.setMsg("该教员已评分，不可删除！");
+        }else{
+            res.setRes(teacherMapper.delete(queryWrapper) > 0);
+            res.setMsg("成功");
+        }
+        return res;
+    }
     public ModifyRes scoreCommit(ScoreCommitReq req){
         JSONArray studentScoreList = JSON.parseArray(req.getScore());
         List<ScoreDO> scoreDOList = new ArrayList<>();
@@ -236,6 +298,18 @@ public class ClassService extends ServiceImpl<ScoreMapper, ScoreDO> {
             res.setRes(0);
             res.setMsg("所有教员的每个指标均需打分，请重新打分");
         }
+        if(req.getOtherSuggestion() != null && !req.getOtherSuggestion().isEmpty()){
+            QueryWrapper<ClassDO> classQw = new QueryWrapper<>();
+            classQw.eq("id",req.getClassId());
+            ClassDO classDO = classMapper.selectOne(classQw);
+            JSONArray sug = new JSONArray();
+            if(classDO.getOtherSuggestion()!=null&& !classDO.getOtherSuggestion().isEmpty()){
+                sug = JSON.parseArray(classDO.getOtherSuggestion());
+            }
+            sug.add(req.getOtherSuggestion());
+            classDO.setOtherSuggestion(sug.toJSONString());
+            classMapper.update(classDO,classQw);
+        }
 
         return res;
     }
@@ -246,9 +320,10 @@ public class ClassService extends ServiceImpl<ScoreMapper, ScoreDO> {
             //设置信息头，告诉浏览器内容为excel类型
             response.setHeader("content-Type", "application/vnd.ms-excel");
             //文件名称
-            String fileName = classRes.getName()+"_"+classRes.getSchoolYear()+classRes.getSchoolTerm()+"_"+"_评教评分表.xlsx";
+            String conChar="_";
+            String fileName = classRes.getSchoolYear()+conChar+classRes.getSchoolTerm()+conChar+classRes.getName()+"_评教评分表.xlsx";
             //sheet名称
-            String sheetName = "打分表";
+            String sheetName = classRes.getSchoolYear()+conChar+classRes.getSchoolTerm()+conChar+classRes.getName();
             fileName = new String(fileName.getBytes(), "ISO-8859-1");
 
             //设置下载名称

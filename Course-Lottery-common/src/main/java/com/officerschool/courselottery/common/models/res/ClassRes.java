@@ -22,4 +22,8 @@ public class ClassRes {
     private String schoolYear;
 
     private String schoolTerm;
+
+    private String cipher;
+
+    private String otherSuggestions;
 }
