@@ -11,11 +11,11 @@ public class ScheduleUtil {
         String sql = "select * , t_expert.name as e_name from t_schedule " +
                 "left join t_course on t_schedule.course_id = t_course.id " +
                 "left join t_expert on t_schedule.expert_id = t_expert.id " +
-                "where ";
+                "where 1 ";
         if (StringUtils.isNotBlank(req.getDate()))
-            sql += "t_course.date='" + req.getDate() + "'";
+            sql += " and t_course.date='" + req.getDate() + "'";
         else
-            sql += "t_course.date>='" + TimeUtil.getBefore7Day() + "' ";
+            sql += " and t_course.date>='" + TimeUtil.getBefore7Day() + "' ";
 
         if (StringUtils.isNotBlank(req.getTeacherTitle()))
             sql += " and t_course.teacher_title='" + req.getTeacherTitle() + "' ";
@@ -23,13 +23,16 @@ public class ScheduleUtil {
         if (StringUtils.isNotBlank(req.getLesson()))
             sql += " and t_course.lesson like '%" + req.getLesson() + "%' ";
 
+        if (StringUtils.isNotBlank(req.getTeacherName()))
+            sql += " and t_course.teacher_name like '%" + req.getTeacherName() + "%' ";
+
         if (req.getExpertId()!=null){
             sql += " and t_schedule.expert_id='" + req.getExpertId() + "' ";
         }
 
         if (StringUtils.isNotBlank(req.getMajor()))
             sql += " and t_course.major like '%" + req.getMajor() + " %' ";
-        sql += " order by t_schedule.expert_id";
+        sql += " order by t_schedule.ctime desc";
         return sql;
     }
 }

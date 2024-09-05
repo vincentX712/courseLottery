@@ -2,6 +2,8 @@ package com.officerschool.courselottery.service;
 
 import cn.afterturn.easypoi.excel.ExcelImportUtil;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
@@ -12,8 +14,10 @@ import com.officerschool.courselottery.common.models.req.DeleteReq;
 import com.officerschool.courselottery.common.models.res.CoursesRes;
 import com.officerschool.courselottery.common.models.res.DeleteRes;
 import com.officerschool.courselottery.dao.dataobject.CourseDO;
+import com.officerschool.courselottery.dao.dataobject.ExpertDO;
 import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
 import com.officerschool.courselottery.dao.mapper.CourseMapper;
+import com.officerschool.courselottery.dao.mapper.ExpertMapper;
 import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
 import com.officerschool.courselottery.service.utils.ScheduleUtil;
@@ -41,6 +45,9 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
     @Resource
     private ScheduleMapper scheduleMapper;
 
+    @Resource
+    private ExpertMapper expertMapper;
+
     public PageInfo<CoursesRes> getCourses(CoursesPageReq req){
         int pageNum = req.getPageNum() == null ? 1 : req.getPageNum();
         int pageSize = req.getPageSize() == null ? 20 : req.getPageSize();
@@ -65,6 +72,19 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
         if (StringUtils.isNotBlank(req.getMajor()))
             sql += " and major like '%" + req.getMajor() + "%' ";
 
+        if(req.getExpertId()!=null){
+            ExpertDO expertDO = expertMapper.selectById(req.getExpertId());
+            if(StringUtils.isNotBlank(expertDO.getRelateMajor())){
+                JSONArray jsonArray = JSON.parseArray(expertDO.getRelateMajor());
+                sql += " and ( 0";
+                for(Object object:jsonArray){
+                    sql += " or major like '%"+object.toString()+"%' ";
+                }
+                sql += ") ";
+            }
+
+        }
+
         if(StringUtils.isNotBlank(req.getCampusId())){
             sql += " and campus_id='" + req.getCampusId() + "' ";
         }
@@ -76,6 +96,11 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
         if(req.getIsPolitics()){
             sql += " and lesson in " + ScheduleUtil.politicsLesson;
         }
+
+        if(req.getIsAcademicClass()){
+            sql += " and is_academic_class = 1 " ;
+        }
+
         sql += " order by node_id";
         List<Map<String, Object>> courseList = courseMapper.getCoursesList(sql);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(courseList);
@@ -88,7 +113,6 @@ public class CourseService extends ServiceImpl<CourseMapper, CourseDO> {
             String expertSql = "select * from t_schedule, t_expert where t_schedule.expert_id = t_expert.id and t_schedule.course_id in("
                     + StringUtils.join(courseIdList, ",") + ") ";
             List<Map<String, Object>> expertList = scheduleMapper.getScheduleList(expertSql);
-//            System.out.println(expertSql);
             for (Map<String, Object> expertMap : expertList) {
                 String val = courseIdExpertNameMap.get(expertMap.get("course_id").toString());
                 if(val == null){

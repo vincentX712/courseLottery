@@ -17,7 +17,7 @@ public class SchedulesRes {
 
     private Integer expertId;
 
-    private Integer teacherId;
+//    private Integer teacherId;
 
     @Excel(name = "专家")
     private String expertName;
@@ -63,6 +63,9 @@ public class SchedulesRes {
 //    @Excel(name = "是否思政课程")
     private Boolean isPolitics;
 
-    @Excel(name = "评级")
+//    @Excel(name = "评级")
     private String evaluation;
+
+    @Excel(name = "抽课时间")
+    private String ctime;
 }

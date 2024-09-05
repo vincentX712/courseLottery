@@ -25,6 +25,8 @@ public class UserDO {
 
     private Integer state;
 
+    private Integer type;
+
     private String token;
 
     private Timestamp ctime;

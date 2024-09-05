@@ -347,6 +347,53 @@ public class ClassService extends ServiceImpl<ScoreMapper, ScoreDO> {
             logger.error("ClassService#exportToExcel error: ", e);
         }
     }
+    public void teacherScoreExport(HttpServletResponse response, String startTime,String endTime){
+        try {
+            String sql ="select name ,sum(totalScore) as totalScore,sum(totalNum) as totalNum\n" +
+                    " from (select teacher.id as id,teacher.name as name,sum(score.overall_score) as totalScore,count(*) as totalNum\n" +
+                    " from t_teacher as teacher left join t_score as score on teacher.id=score.teacher_id where \n" +
+                    "score.commit_time>'"+startTime+"' and \n" +
+                    "score.commit_time<'"+endTime+"' group by teacher.id) as statistic \n" +
+                    "group by statistic.name;";
+            List<TeacherDO> teacherDOList = teacherMapper.getTeacherList(sql);
+            List<TeacherRes> teacherResList = new ArrayList<>();
+            for(TeacherDO teacherDO:teacherDOList){
+                TeacherRes teacherRes = new TeacherRes();
+                teacherRes.setName(teacherDO.getName());
+                teacherRes.setTotalScore(teacherDO.getTotalScore());
+                teacherRes.setTotalNum(teacherDO.getTotalNum());
+                teacherResList.add(teacherRes);
+            }
+            //设置信息头，告诉浏览器内容为excel类型
+            response.setHeader("content-Type", "application/vnd.ms-excel");
+            //文件名称
+            String conChar="_";
+            String fileName = "教学质量评教评分表.xlsx";
+            //sheet名称
+            String sheetName = startTime+conChar+endTime;
+            fileName = new String(fileName.getBytes(), "ISO-8859-1");
+
+            //设置下载名称
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+            //字节流输出
+            ServletOutputStream out = response.getOutputStream();
+            //设置excel参数
+            ExportParams params = new ExportParams();
+            //设置sheet名
+            params.setSheetName(sheetName);
+            //设置标题
+//        params.setTitle("听课表");
+
+            //转成对应的类型
+//        List<ScheduleDO> exportUsers = changeType(users);
+            //导入excel
+            Workbook workbook = ExcelExportUtil.exportExcel(params, TeacherRes.class, teacherResList);
+            //写入
+            workbook.write(out);
+        } catch (Exception e) {
+            logger.error("ClassService#exportToExcel error: ", e);
+        }
+    }
     private Integer getGoodNum(Integer totalNum){
         Integer standardGood = computeHalfUp(String.valueOf(totalNum*0.6));
         switch (totalNum){

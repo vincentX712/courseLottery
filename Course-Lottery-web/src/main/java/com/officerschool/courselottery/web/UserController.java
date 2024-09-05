@@ -49,6 +49,7 @@ public class UserController {
                 JSONObject result = new JSONObject();
                 result.put("token", token);
                 result.put("phone", userInfo.getPhone());
+                result.put("type",userInfo.getType());
                 return CommonResult.createOK(result);
             }
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);

@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -143,9 +144,11 @@ public class LotteryService {
             res.setRes(false);
             res.setMsg("该课程已被其他专家抽取，请抽取其他课！");
         }else{
+            Timestamp now = new Timestamp(System.currentTimeMillis());
             ScheduleDO schedule = new ScheduleDO();
             schedule.setExpertId(req.getExpertId());
             schedule.setCourseId(req.getCourseId());
+            schedule.setCtime(now);
 //            schedule.setTeacherId(course.getTeacherId());
             res.setRes(scheduleMapper.insert(schedule) > 0);
             res.setMsg("成功");

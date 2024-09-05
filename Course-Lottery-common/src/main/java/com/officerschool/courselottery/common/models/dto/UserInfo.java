@@ -16,4 +16,6 @@ public class UserInfo {
     private String id;
 
     private String phone;
+
+    private Integer type;
 }

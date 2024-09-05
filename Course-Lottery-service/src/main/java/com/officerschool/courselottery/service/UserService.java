@@ -60,6 +60,7 @@ public class UserService {
         userInfo.setId(userDO.getId());
         userInfo.setName(userDO.getName());
         userInfo.setPhone(userDO.getPhone());
+        userInfo.setType(userDO.getType());
         return userInfo;
     }
 }

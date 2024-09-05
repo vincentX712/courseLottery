@@ -5,9 +5,7 @@ import com.officerschool.courselottery.common.models.CommonResult;
 import com.officerschool.courselottery.common.models.req.*;
 import com.officerschool.courselottery.service.CourseService;
 import com.officerschool.courselottery.service.ExpertService;
-import com.officerschool.courselottery.service.LotteryService;
 import com.officerschool.courselottery.service.ScheduleService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,22 +19,19 @@ import javax.annotation.Resource;
  * 抽课系统
  * @author : create by anyuxin
  * @version : v1.0
- * @date : 2023/12/19
+ * @date : 2024/9/4
  */
 @RestController
-@RequestMapping("/lottery/course")
-public class LotteryController {
+@RequestMapping("/lottery/course/needLogin")
+public class LotteryNeedLoginController {
 
-    private final Logger logger = LoggerFactory.getLogger(LotteryController.class);
+    private final Logger logger = LoggerFactory.getLogger(LotteryNeedLoginController.class);
 
     @Resource
     private ExpertService expertService;
 
     @Resource
     private ScheduleService scheduleService;
-
-    @Resource
-    private LotteryService lotteryService;
 
     @Resource
     private CourseService courseService;
@@ -47,44 +42,6 @@ public class LotteryController {
             return CommonResult.createOK(expertService.getExpertList(req));
         } catch (Exception e) {
             logger.error("LotteryController#experts error: ", e);
-            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
-        }
-    }
-
-    @RequestMapping(value = "/lottery", method = RequestMethod.POST)
-    public CommonResult lottery(@RequestBody LotteryReq req) {
-        try {
-            if (StringUtils.isBlank(req.getExpertId().toString())) {
-                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
-            }
-            return CommonResult.createOK(lotteryService.lottery(req));
-        } catch (Exception e) {
-            logger.error("LotteryController#lottery error: ", e);
-            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
-        }
-    }
-
-    @RequestMapping(value = "/teacherScheduleSearch", method = RequestMethod.GET)
-    public CommonResult teacherScheduleSearch(ConfirmLotteryReq req) {
-        try {
-            if (StringUtils.isBlank(req.getCourseId().toString()))
-                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
-            return CommonResult.createOK(scheduleService.isCourseTeacherHasLotteried(req.getCourseId()));
-        } catch (Exception e) {
-            logger.error("LotteryController#lottery error: ", e);
-            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
-        }
-    }
-
-    @RequestMapping(value = "/confirm", method = RequestMethod.POST)
-    public CommonResult confirmLottery(@RequestBody ConfirmLotteryReq req) {
-        try {
-            if (StringUtils.isBlank(req.getExpertId().toString()) || StringUtils.isBlank(req.getCourseId().toString()))
-                return CommonResult.fail(ErrorCodeEnum.REQUEST_PARAM_NULL);
-
-            return CommonResult.createOK(lotteryService.confirmLottery(req));
-        } catch (Exception e) {
-            logger.error("LotteryController#confirmLottery error: ", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }
@@ -109,12 +66,52 @@ public class LotteryController {
         }
     }
 
+    @RequestMapping(value = "/expert/insert", method = RequestMethod.POST)
+    public CommonResult expertInsert(@RequestBody ExpertReq req){
+        try {
+            return CommonResult.createOK(expertService.expertInsert(req));
+        } catch (Exception e) {
+            logger.error("LotteryNeedLoginController#experts error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/expert/modify", method = RequestMethod.POST)
+    public CommonResult expertModify(@RequestBody ExpertReq req){
+        try {
+            return CommonResult.createOK(expertService.expertModify(req));
+        } catch (Exception e) {
+            logger.error("LotteryNeedLoginController#experts error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/expert/delete", method = RequestMethod.POST)
+    public CommonResult expertDelete(@RequestBody DeleteReq req) {
+        try {
+            return CommonResult.createOK(expertService.deleteExpert(req));
+        } catch (Exception e) {
+            logger.error("LotteryNeedLoginController#expertDelete error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(value = "/schedule/delete", method = RequestMethod.POST)
     public CommonResult scheduleDelete(@RequestBody DeleteReq req) {
         try {
             return CommonResult.createOK(scheduleService.deleteSchedule(req));
         } catch (Exception e) {
-            logger.error("LotteryController#scheduleDelete error: ", e);
+            logger.error("LotteryNeedLoginController#scheduleDelete error: ", e);
+            return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/course/delete", method = RequestMethod.POST)
+    public CommonResult courseDelete(@RequestBody DeleteReq req) {
+        try {
+            return CommonResult.createOK(courseService.deleteCourse(req));
+        } catch (Exception e) {
+            logger.error("LotteryNeedLoginController#courseDelete error: ", e);
             return CommonResult.fail(ErrorCodeEnum.SERVER_ERROR);
         }
     }

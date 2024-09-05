@@ -12,7 +12,10 @@ import com.officerschool.courselottery.common.models.req.DeleteReq;
 import com.officerschool.courselottery.common.models.req.SchedulesPageReq;
 import com.officerschool.courselottery.common.models.res.DeleteRes;
 import com.officerschool.courselottery.common.models.res.SchedulesRes;
+import com.officerschool.courselottery.common.models.res.TeacherLotteriedRes;
+import com.officerschool.courselottery.dao.dataobject.CourseDO;
 import com.officerschool.courselottery.dao.dataobject.ScheduleDO;
+import com.officerschool.courselottery.dao.mapper.CourseMapper;
 import com.officerschool.courselottery.dao.mapper.ScheduleMapper;
 import com.officerschool.courselottery.service.utils.PageUtil;
 import com.officerschool.courselottery.service.utils.ScheduleUtil;
@@ -25,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +46,9 @@ public class ScheduleService extends ServiceImpl<ScheduleMapper, ScheduleDO> {
 
     @Resource
     private ScheduleMapper scheduleMapper;
+
+    @Resource
+    private CourseMapper courseMapper;
 
     public PageInfo<SchedulesRes> getSchedules(SchedulesPageReq req) {
         int pageNum = req.getPageNum() == null ? 1 : req.getPageNum();
@@ -136,6 +143,31 @@ public class ScheduleService extends ServiceImpl<ScheduleMapper, ScheduleDO> {
             return false;
         }
     }
+
+    public TeacherLotteriedRes isCourseTeacherHasLotteried(Integer courseId) {
+        TeacherLotteriedRes res = new TeacherLotteriedRes();
+        SchedulesPageReq req = new SchedulesPageReq();
+        QueryWrapper<CourseDO> courseDOQueryWrapper = new QueryWrapper<>();
+        courseDOQueryWrapper.eq("id", courseId);
+        CourseDO courseDO=courseMapper.selectOne(courseDOQueryWrapper);
+        req.setTeacherName(courseDO.getTeacherName());
+        String sql = new ScheduleUtil().getSchedulesSql(req);
+        List<Map<String, Object>> list = scheduleMapper.getScheduleList(sql);
+        if(list.isEmpty()){
+            res.setIsLotteried(false);
+            res.setLotteriedCount(0);
+            return res;
+        }
+        res.setIsLotteried(true);
+        List<SchedulesRes> resList = new ArrayList<>();
+        for (Map<String, Object> mapItem : list) {
+            SchedulesRes schedulesRes = setSchedule(mapItem);
+            resList.add(schedulesRes);
+        }
+        res.setLotteriedCount(resList.size());
+        res.setSchedulesRes(resList);
+        return res;
+    }
     private SchedulesRes setSchedule(Map<String, Object> mapItem){
         SchedulesRes res = new SchedulesRes();
         res.setId(Integer.valueOf(mapItem.get("id").toString()));
@@ -160,6 +192,13 @@ public class ScheduleService extends ServiceImpl<ScheduleMapper, ScheduleDO> {
         }
         if(mapItem.get("lesson_attribute")!=null){
             res.setLessonAttribute(mapItem.get("lesson_attribute").toString());
+        }
+        if(mapItem.get("ctime")!=null){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+            // 使用SimpleDateFormat的format方法将Timestamp格式化为字符串
+            String formattedDate = dateFormat.format(mapItem.get("ctime"));
+            res.setCtime(formattedDate);
         }
         res.setIsPolitics(ScheduleUtil.politicsLesson.contains(mapItem.get("lesson").toString()));
         return res;

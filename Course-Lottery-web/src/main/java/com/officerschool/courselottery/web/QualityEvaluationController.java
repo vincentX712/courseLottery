@@ -149,4 +149,13 @@ public class QualityEvaluationController {
             logger.error("excelExport error", e);
         }
     }
+
+    @RequestMapping(value = "/schoolTerm/teacher/score/export", method = RequestMethod.GET)
+    public void scoreExport(HttpServletResponse response, String startTime,String endTime){
+        try {
+            classService.teacherScoreExport(response,startTime,endTime);
+        } catch (Exception e){
+            logger.error("excelExport error", e);
+        }
+    }
 }

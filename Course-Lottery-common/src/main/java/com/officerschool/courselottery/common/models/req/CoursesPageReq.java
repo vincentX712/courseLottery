@@ -29,4 +29,8 @@ public class CoursesPageReq {
     private String nodeId;
 
     private Boolean isPolitics;
+
+    private Boolean isAcademicClass;  // 是否学历班
+
+    private Integer expertId;
 }

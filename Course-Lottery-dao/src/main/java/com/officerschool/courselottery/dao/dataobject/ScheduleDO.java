@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 /**
  * @author : create by anyuxin
@@ -32,4 +32,5 @@ public class ScheduleDO {
     @Excel(name = "evaluation")
     private String evaluation; // 评价等级
 
+    private Timestamp ctime;
 }
